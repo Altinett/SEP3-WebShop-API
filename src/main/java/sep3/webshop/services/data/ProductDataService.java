@@ -7,7 +7,6 @@ import sep3.webshop.shared.model.Product;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -21,21 +20,20 @@ public class ProductDataService {
     }
 
     private static Product createProduct(ResultSet rs) throws SQLException {
-        return new Product(rs.getInt("id"));
+        int id = rs.getInt("product_id");
+        String name = rs.getString("name");
+        String description = rs.getString("description");
+        double price = rs.getDouble("price");
+        int categoryId = rs.getInt("category_id");
+        int amount = rs.getInt("amount");
+        return new Product(id, name, description, price, categoryId, amount);
     }
 
     public List<Product> getProducts() throws SQLException {
-        List<Product> products = new ArrayList<>();
-        products.add(new Product(1));
-        products.add(new Product(69));
-        products.add(new Product(2));
-        return products;
-        /*
         return helper.map(
                 ProductDataService::createProduct,
                 "SELECT * FROM products LIMIT 40"
-                );
-         */
+        );
     }
 }
 

@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import sep3.webshop.services.data.DatabaseHelper;
+import sep3.webshop.shared.model.Order;
 import sep3.webshop.shared.model.Product;
 
 @Configuration
@@ -21,4 +22,10 @@ public class WebConfig {
         return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
     }
 
+
+    @Bean
+    @Scope("singleton")
+    public DatabaseHelper<Order> getOrderHelper() {
+        return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
+    }
 }
