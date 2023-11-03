@@ -2,9 +2,7 @@ package sep3.webshop.services.controllers;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sep3.webshop.services.data.OrderDataService;
 import sep3.webshop.shared.model.Order;
 
@@ -24,5 +22,15 @@ public class OrderController {
     @GetMapping
     public List<Order> getOrders() throws SQLException {
         return data.getOrders();
+    }
+
+    @GetMapping("/{orderId}")
+    public Order getOrder(@PathVariable int orderId) throws SQLException {
+        return data.getOrder(orderId);
+    }
+
+    @PostMapping("/order")
+    public Order createOrder(@RequestBody Order order) throws SQLException {
+        return data.createOrder(order);
     }
 }

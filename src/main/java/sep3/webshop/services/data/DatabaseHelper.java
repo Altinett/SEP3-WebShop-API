@@ -1,6 +1,8 @@
 package sep3.webshop.services.data;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.postgresql.Driver;
 
 import java.sql.*;
@@ -90,4 +92,5 @@ public class DatabaseHelper<T> {
             return all;
         }
     }
+
 }

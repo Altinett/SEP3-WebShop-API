@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import sep3.webshop.services.data.DatabaseHelper;
 import sep3.webshop.shared.model.Order;
@@ -28,4 +29,5 @@ public class WebConfig {
     public DatabaseHelper<Order> getOrderHelper() {
         return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
     }
+
 }

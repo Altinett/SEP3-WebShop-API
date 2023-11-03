@@ -1,9 +1,9 @@
 package sep3.webshop.services.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import sep3.webshop.services.data.ProductDataService;
 import sep3.webshop.shared.model.Product;
 
@@ -23,5 +23,20 @@ public class ProductController {
     @GetMapping
     public List<Product> getProducts() throws SQLException {
         return data.getProducts();
+    }
+
+    @PostMapping("/add")
+    public void addProduct(@RequestBody Product product) throws SQLException {
+        data.addProduct(product);
+    }
+
+    @PostMapping("/edit")
+    public void editProduct(@RequestBody Product product) throws SQLException {
+        data.editProduct(product);
+    }
+
+    @PostMapping("/remove")
+    public void removeProduct(@RequestParam int id) throws SQLException {
+        data.removeProduct(id);
     }
 }
