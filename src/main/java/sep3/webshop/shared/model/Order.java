@@ -1,13 +1,11 @@
 package sep3.webshop.shared.model;
 
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Order {
     private int orderId;
-    private String firstname, lastname;
-    private String address;
+    private String firstname, lastname, address;
     private int postcode;
     private Date date;
     private boolean status;
@@ -82,7 +80,7 @@ public class Order {
         return date;
     }
 
-    public boolean isStatus() {
+    public boolean getStatus() {
         return status;
     }
 

@@ -1,7 +1,5 @@
 package sep3.webshop.services.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import sep3.webshop.services.data.ProductDataService;
@@ -30,12 +28,12 @@ public class ProductController {
         data.addProduct(product);
     }
 
-    @PostMapping("/edit")
+    @PatchMapping("/edit")
     public void editProduct(@RequestBody Product product) throws SQLException {
         data.editProduct(product);
     }
 
-    @PostMapping("/remove")
+    @DeleteMapping("/remove")
     public void removeProduct(@RequestParam int id) throws SQLException {
         data.removeProduct(id);
     }
