@@ -23,12 +23,12 @@ public class OrderController {
     public List<Order> getOrders() throws SQLException {
         return data.getOrders();
     }
-
+    @CrossOrigin
     @GetMapping("/{orderId}")
     public Order getOrder(@PathVariable int orderId) throws SQLException {
         return data.getOrder(orderId);
     }
-
+    @CrossOrigin
     @PostMapping("/order")
     public Order createOrder(@RequestBody Order order) throws SQLException {
         return data.createOrder(order);
