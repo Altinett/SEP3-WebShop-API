@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/products")
 public class ProductController {
     private final ProductDataService data;
@@ -24,7 +25,7 @@ public class ProductController {
     public List<Product> getProducts() throws SQLException {
         return data.getProducts();
     }
-    @CrossOrigin
+
     @PostMapping("/add")
     public void addProduct(@RequestBody Product product) throws SQLException {
         System.out.println("TESTING");
@@ -38,12 +39,12 @@ public class ProductController {
         System.out.println("TESTINGDONE");
         data.addProduct(product);
     }
-    @CrossOrigin
-    @PatchMapping("/edit")
+
+    @PostMapping("/edit")
     public void editProduct(@RequestBody Product product) throws SQLException {
         data.editProduct(product);
     }
-    @CrossOrigin
+
     @DeleteMapping("/remove")
     public void removeProduct(@RequestParam int id) throws SQLException {
         data.removeProduct(id);
