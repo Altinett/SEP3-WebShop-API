@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import sep3.webshop.shared.model.Order;
 
+import java.math.BigDecimal;
 import java.sql.Array;
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -100,12 +101,22 @@ public class OrderDataService {
         );
     }
 
+    public void updateTotal(int orderId) throws SQLException {
+        helper.executeUpdate(
+                "UPDATE Orders SET total=(" +
+                "SELECT SUM(p.price) total "+
+                "FROM Products p JOIN OrderProducts OP " +
+                "ON p.id=OP.product_id AND OP.order_id=?"+
+                ") WHERE id=?",
+                orderId,
+                orderId
+        );
+    }
+
+
+
     public Order createOrder(Order order) throws SQLException {
-        try {
-            ObjectWriter ow = new ObjectMapper().writerWithDefaultPrettyPrinter();
-            System.out.println(ow.writeValueAsString(order));
-            System.out.println(order.getDate());
-        } catch(Exception e) {}
+
         helper.executeUpdate(
             "INSERT INTO Orders "+
             "VALUES(DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -124,7 +135,6 @@ public class OrderDataService {
         List<Integer> ids = order.getProductIds();
 
         // Populate new order
-
         order = this.getOrder(order);
         try {
             ObjectWriter ow = new ObjectMapper().writerWithDefaultPrettyPrinter();
@@ -141,6 +151,15 @@ public class OrderDataService {
             query += "(" + orderId + ", " + ids.get(i) + ")" + endPrefix;
         }
         helper.executeUpdate(query);
+
+        // Update order total
+        updateTotal(orderId);
+
+        try {
+            ObjectWriter ow = new ObjectMapper().writerWithDefaultPrettyPrinter();
+            System.out.println(ow.writeValueAsString(order));
+            System.out.println(order.getDate());
+        } catch(Exception e) {}
 
         return order;
     }
