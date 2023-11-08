@@ -14,6 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 @Component
 @Scope("singleton")
@@ -40,12 +41,12 @@ public class OrderDataService {
         String lastname = rs.getString("lastname");
         String address = rs.getString("address");
         int postcode = rs.getInt("postcode");
-        Date date = rs.getDate("date");
+        //Date date = rs.getDate("date");
         boolean status = rs.getBoolean("status");
         int total = rs.getInt("total");
         int phoneNumber = rs.getInt("phonenumber");
         String email = rs.getString("email");
-        return new Order(orderId, firstname, lastname, address, postcode, date, status, total, phoneNumber, email);
+        return new Order(orderId, firstname, lastname, address, postcode, status, total, phoneNumber, email);
     }
 
     public List<Order> getOrders() throws SQLException {
@@ -77,7 +78,7 @@ public class OrderDataService {
     private Order getOrder(Order order) throws SQLException {
         return helper.mapSingle(
                 OrderDataService::createOrderWithoutProducts,
-                "SELECT * FROM Orders WHERE "+
+                "SELECT * FROM Orders o WHERE "+
                 "firstname=? AND " +
                 "lastname=? AND " +
                 "address=? AND " +
@@ -86,6 +87,7 @@ public class OrderDataService {
                 "total=? AND " +
                 "phonenumber=? AND " +
                 "email=? " +
+                "ORDER BY o.id DESC " +
                 "LIMIT 1",
                 order.getFirstname(),
                 order.getLastname(),
@@ -99,6 +101,11 @@ public class OrderDataService {
     }
 
     public Order createOrder(Order order) throws SQLException {
+        try {
+            ObjectWriter ow = new ObjectMapper().writerWithDefaultPrettyPrinter();
+            System.out.println(ow.writeValueAsString(order));
+            System.out.println(order.getDate());
+        } catch(Exception e) {}
         helper.executeUpdate(
             "INSERT INTO Orders "+
             "VALUES(DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -117,7 +124,12 @@ public class OrderDataService {
         List<Integer> ids = order.getProductIds();
 
         // Populate new order
+
         order = this.getOrder(order);
+        try {
+            ObjectWriter ow = new ObjectMapper().writerWithDefaultPrettyPrinter();
+            System.out.println(ow.writeValueAsString(order));
+        } catch(Exception e) {}
         order.setProductIds(ids);
 
         // Add product ids into orderproducts

@@ -1,13 +1,17 @@
 package sep3.webshop.shared.model;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 import java.sql.Date;
 import java.util.List;
 
 public class Order {
+    long millis = System.currentTimeMillis();
     private int orderId;
     private String firstname, lastname, address;
     private int postcode;
-    private Date date;
+    private Date date = new Date(millis);
     private boolean status;
     private int total;
     private int phoneNumber;
@@ -21,7 +25,6 @@ public class Order {
         String lastname,
         String address,
         int postcode,
-        Date date,
         boolean status,
         int total,
         int phoneNumber,
@@ -31,7 +34,7 @@ public class Order {
         this.lastname = lastname;
         this.address = address;
         this.postcode = postcode;
-        this.date = date;
+        this.date = new java.sql.Date(millis);
         this.status = status;
         this.total = total;
         this.phoneNumber = phoneNumber;
@@ -44,15 +47,16 @@ public class Order {
         String lastname,
         String address,
         int postcode,
-        Date date,
         boolean status,
         int total,
         int phoneNumber,
         String email,
         List<Integer> productIds
     ) {
-        this(firstname, lastname, address, postcode, date, status, total, phoneNumber, email);
+        this(firstname, lastname, address, postcode, status, total, phoneNumber, email);
         this.orderId = orderId;
+        this.date = new Date(millis);
+        System.out.println(new Date(millis));
         this.productIds = productIds;
     }
 
@@ -62,14 +66,14 @@ public class Order {
             String lastname,
             String address,
             int postcode,
-            Date date,
             boolean status,
             int total,
             int phoneNumber,
             String email
     ) {
-        this(firstname, lastname, address, postcode, date, status, total, phoneNumber, email);
+        this(firstname, lastname, address, postcode, status, total, phoneNumber, email);
         this.orderId = orderId;
+        this.date = new java.sql.Date(millis);
     }
 
     public int getOrderId() {
