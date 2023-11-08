@@ -24,11 +24,13 @@ public class ProductDataService {
 
     private static Product createProduct(ResultSet rs) throws SQLException {
         Product product = ProductDataService.createProductWithoutCategoryIds(rs);
+        try {
         List<Integer> productIds = new ArrayList<>();
         for (String id : rs.getString("category_ids").split(",")) {
             productIds.add(Integer.parseInt(id));
         }
-        product.setCategoryIds(productIds);
+        product.setCategoryIds(productIds);}
+        catch (Exception e){e.printStackTrace();}
         return product;
     }
     private static Product createProductWithoutCategoryIds(ResultSet rs) throws SQLException {
@@ -43,7 +45,11 @@ public class ProductDataService {
     public List<Product> getProducts() throws SQLException {
         return helper.map(
                 ProductDataService::createProduct,
-                "SELECT * FROM Products LIMIT 40"
+                "select p.*, string_agg(PC.category_id::text, ',') AS category_ids from products p " +
+                "join ProductCategories PC on p.id = PC.product_id " +
+                "group by p.id "+
+                "order by p.id " +
+                "limit 40 "
         );
     }
     private Product getProduct(Product product) throws SQLException {
