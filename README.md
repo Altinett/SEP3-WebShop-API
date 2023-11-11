@@ -13,7 +13,6 @@ Open IntelliJ IDE and for each of the `pom.xml` files inside `Persistence`, `Res
 ## API Endpoints
 ### Orders
 #### Retrieve a list of all orders
-##### Request
 `GET /orders`
 
 ```python
@@ -21,7 +20,6 @@ url = "http://localhost:8080/orders"
 
 response = requests.get(url)
 ```
-##### Response
 ```json
 [{
     "orderId": 1,
