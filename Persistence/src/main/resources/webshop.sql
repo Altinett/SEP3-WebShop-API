@@ -50,6 +50,7 @@ CREATE table OrderProducts (
     order_id int,
     foreign key (order_id) references Orders(id),
     product_id int,
+    quantity int,
     foreign key (product_id) references Products(id) on delete cascade,
     primary key (order_id, product_id)
 );
