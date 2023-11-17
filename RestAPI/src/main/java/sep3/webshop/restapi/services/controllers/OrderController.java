@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sep3.webshop.restapi.services.data.OrderDataService;
 import sep3.webshop.shared.model.Order;
+import sep3.webshop.shared.utils.Printer;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -39,6 +40,7 @@ public class OrderController {
     @PostMapping("/order")
     public ResponseEntity<Order> createOrder(@RequestBody Order order) throws IOException {
         Order createdOrder = data.createOrder(order);
+        Printer.print(order);
         return new ResponseEntity<>(createdOrder, HttpStatus.OK);
     }
 

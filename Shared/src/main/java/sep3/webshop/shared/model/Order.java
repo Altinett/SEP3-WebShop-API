@@ -3,6 +3,7 @@ package sep3.webshop.shared.model;
 import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 
 public class Order implements Serializable {
     long millis = System.currentTimeMillis();
@@ -15,6 +16,7 @@ public class Order implements Serializable {
     private int phoneNumber;
     private String email;
     private List<Integer> productIds;
+    private Map<Integer, Integer> products;
 
     public Order() {}
 
@@ -73,6 +75,24 @@ public class Order implements Serializable {
         this.date = new Date(millis);
     }
 
+    public Order (
+            int orderId,
+            String firstname,
+            String lastname,
+            String address,
+            int postcode,
+            boolean status,
+            int total,
+            int phoneNumber,
+            String email,
+            Map<Integer, Integer> products
+    ) {
+        this(firstname, lastname, address, postcode, status, total, phoneNumber, email);
+        this.orderId = orderId;
+        this.date = new Date(millis);
+        this.products = products;
+    }
+
     public int getOrderId() {
         return orderId;
     }
@@ -116,5 +136,8 @@ public class Order implements Serializable {
     }
     public void setProductIds(List<Integer> ids) {
         productIds = ids;
+    }
+    public Map<Integer, Integer> getProducts() {
+        return products;
     }
 }
