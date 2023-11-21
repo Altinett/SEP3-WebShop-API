@@ -31,16 +31,15 @@ public class OrderController {
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
-    @GetMapping("/{orderId}")
-    public ResponseEntity<Order> getOrder(@PathVariable int orderId) throws IOException {
-        Order order = data.getOrder(orderId);
+    @GetMapping("/{id}")
+    public ResponseEntity<Order> getOrder(@PathVariable int id) throws IOException {
+        Order order = data.getOrder(id);
         return new ResponseEntity<>(order, HttpStatus.OK);
     }
 
     @PostMapping("/order")
     public ResponseEntity<Order> createOrder(@RequestBody Order order) throws IOException {
         Order createdOrder = data.createOrder(order);
-        Printer.print(order);
         return new ResponseEntity<>(createdOrder, HttpStatus.OK);
     }
 

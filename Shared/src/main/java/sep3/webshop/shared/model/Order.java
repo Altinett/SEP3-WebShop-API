@@ -93,6 +93,10 @@ public class Order implements Serializable {
         this.products = products;
     }
 
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
+    }
+
     public int getOrderId() {
         return orderId;
     }

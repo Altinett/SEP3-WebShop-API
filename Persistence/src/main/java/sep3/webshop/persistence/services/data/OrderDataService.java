@@ -13,6 +13,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 @Component
 @Scope("singleton")
@@ -30,6 +32,7 @@ public class OrderDataService {
         listener.on("getOrders", this::getOrders);
         listener.on("createOrder", this::createOrder);
     }
+
     public <T> void getOrder(String correlationId, Channel channel, T data) {
         try {
             Order order = getOrder((int) data);
@@ -105,37 +108,13 @@ public class OrderDataService {
                 orderId
         );
     }
-    private Order getOrder(Order order) throws SQLException {
-        return helper.mapSingle(
-                OrderDataService::createOrderWithoutProducts,
-                "SELECT * FROM Orders o WHERE "+
-                        "firstname=? AND " +
-                        "lastname=? AND " +
-                        "address=? AND " +
-                        "postcode=? AND " +
-                        "date=? AND " +
-                        "total=? AND " +
-                        "phonenumber=? AND " +
-                        "email=? " +
-                        "ORDER BY o.id DESC " +
-                        "LIMIT 1",
-                order.getFirstname(),
-                order.getLastname(),
-                order.getAddress(),
-                order.getPostcode(),
-                order.getDate(),
-                order.getTotal(),
-                order.getPhoneNumber(),
-                order.getEmail()
-        );
-    }
 
     private void updateTotal(int orderId) throws SQLException {
         helper.executeUpdate(
                 "UPDATE Orders SET total=(" +
-                        "SELECT SUM(p.price) total "+
-                        "FROM Products p JOIN OrderProducts OP " +
-                        "ON p.id=OP.product_id AND OP.order_id=?"+
+                        "SELECT SUM(P.price * OP.quantity) total "+
+                        "FROM Products P JOIN OrderProducts OP " +
+                        "ON P.id=OP.product_id AND OP.order_id=?"+
                         ") WHERE id=?",
                 orderId,
                 orderId
@@ -143,38 +122,29 @@ public class OrderDataService {
     }
 
     private Order createOrder(Order order) throws SQLException {
-        helper.executeUpdate(
-                "INSERT INTO Orders " +
-                "VALUES(DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                order.getFirstname(),
-                order.getLastname(),
-                order.getAddress(),
-                order.getPostcode(),
-                order.getDate(),
-                false,
-                order.getTotal(),
-                order.getPhoneNumber(),
-                order.getEmail()
-        );
+        int id = helper.executeUpdateWithGeneratedKeys(
+            "INSERT INTO Orders " +
+            "VALUES(DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            order.getFirstname(),
+            order.getLastname(),
+            order.getAddress(),
+            order.getPostcode(),
+            order.getDate(),
+            false,
+            order.getTotal(),
+            order.getPhoneNumber(),
+            order.getEmail()
+        ).get(0);
+        order.setOrderId(id);
 
-        // Save copy of product ids
-        List<Integer> ids = order.getProductIds();
-
-        // Populate new order
-        order = this.getOrder(order);
-        order.setProductIds(ids);
-
-        // Add product ids into orderproducts
-        int orderId = order.getOrderId();
-        int idsLength = ids.size();
-        String query = "INSERT INTO OrderProducts VALUES ";
-        for (int i = 0; i < idsLength; i++) {
-            String endPrefix = i == idsLength-1 ? ";" : ",";
-            query += "(" + orderId + ", " + ids.get(i) + ")" + endPrefix;
+        Map<Integer, Integer> products = order.getProducts();
+        StringBuilder query = new StringBuilder("INSERT INTO OrderProducts VALUES ");
+        for (int key : products.keySet()) {
+            query.append("(").append(id).append(", ").append(key).append(", ").append(products.get(key)).append("),");
         }
-        helper.executeUpdate(query);
+        helper.executeUpdate(query.substring(0, query.length() - 1));
 
-        updateTotal(orderId);
+        updateTotal(id);
 
         return order;
     }

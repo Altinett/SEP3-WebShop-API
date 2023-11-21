@@ -29,6 +29,9 @@ public class RequestHelper {
         }
     }
 
+    public <T> CompletableFuture<T> sendRequest(String requestType) throws IOException {
+        return sendRequest(requestType, null);
+    }
     public <T> CompletableFuture<T> sendRequest(String requestType, T data) throws IOException {
         // Create message
         String correlationId = UUID.randomUUID().toString();

@@ -9,6 +9,7 @@ import sep3.webshop.restapi.services.messaging.ResponseQueueListener;
 import sep3.webshop.restapi.services.messaging.RequestSender;
 import sep3.webshop.shared.amqp.RequestMessage;
 import sep3.webshop.shared.model.Order;
+import sep3.webshop.shared.utils.Printer;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -28,15 +29,18 @@ public class OrderDataService {
     }
 
     public List<Order> getOrders() throws IOException {
-        CompletableFuture<List<Order>> future = requestHelper.sendRequest("getOrders", null);
+        CompletableFuture<List<Order>> future = requestHelper.sendRequest("getOrders");
+
         return requestHelper.handleFuture(future);
     }
     public Order getOrder(int orderId) throws IOException {
         CompletableFuture<Object> future = requestHelper.sendRequest("getOrder", orderId);
+
         return (Order) requestHelper.handleFuture(future);
     }
     public Order createOrder(Order order) throws IOException {
         CompletableFuture<Order> future = requestHelper.sendRequest("createOrder", order);
+
         return requestHelper.handleFuture(future);
     }
 
