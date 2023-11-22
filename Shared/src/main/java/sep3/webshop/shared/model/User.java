@@ -30,30 +30,24 @@ public class User implements Serializable {
     public Date getDob() {
         return dob;
     }
-
     public int getId() {
         return id;
     }
     public void setId(int id) {
         this.id = id;
     }
-
     public String getUsername() {
         return username;
     }
-
     public String getPassword() {
         return password;
     }
-
     public String getEmail() {
         return email;
     }
-
     public String getFirstname() {
         return firstname;
     }
-
     public String getLastname() {
         return lastname;
     }
