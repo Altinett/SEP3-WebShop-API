@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import sep3.webshop.persistence.services.data.DatabaseHelper;
+import sep3.webshop.shared.model.User;
 import sep3.webshop.shared.model.Order;
 import sep3.webshop.shared.model.Product;
 
@@ -25,6 +26,12 @@ public class Config {
     @Bean
     @Scope("singleton")
     public DatabaseHelper<Product> getProductHelper() {
+        return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
+    }
+
+    @Bean
+    @Scope("singleton")
+    public DatabaseHelper<User> getUserHelper() {
         return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
     }
 

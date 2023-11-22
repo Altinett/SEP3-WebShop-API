@@ -1,8 +1,9 @@
 package sep3.webshop.shared.model;
 
+import java.io.Serializable;
 import java.sql.Date;
 
-public class User {
+public class User implements Serializable {
     private int id;
     private String username, password, email, firstname, lastname;
     private Date dob;
@@ -21,6 +22,10 @@ public class User {
     public User(int id, String username, String password, String email, String firstname, String lastname, Date dob) {
         this(username, password, email, firstname, lastname, dob);
         this.id = id;
+    }
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
     public Date getDob() {
