@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import sep3.webshop.persistence.services.messaging.RequestQueueListener;
 import sep3.webshop.persistence.services.messaging.ResponseSender;
 import sep3.webshop.shared.model.Product;
+import sep3.webshop.shared.utils.Observer;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -28,13 +29,16 @@ public class ProductDataService {
     ) {
         this.helper = helper;
 
-        listener.on("getProducts",this::getProducts);
-        listener.on("addProduct", this::addProduct);
+        //listener.on("getProducts",this::getProducts);
+        listener.on("getProducts", RequestHandler.newObserver(this::getProducts));
+        //listener.on("addProduct", this::addProduct);
+        listener.on("addProduct", RequestHandler.newObserver(this::addProduct));
         listener.on("editProduct", this::editProduct);
         listener.on("removeProduct", this::removeProduct);
         listener.on("searchProducts", this::searchProducts);
         listener.on("getProductsByOrderId", this::getProductsByOrderId);
     }
+
     public <T> void getProductsByOrderId(String correlationId, Channel channel, T data) {
         try {
             List<Product> products = getProductsByOrderId((int) data);
@@ -51,6 +55,7 @@ public class ProductDataService {
             e.printStackTrace();
         }
     }
+    /*
     public <T> void getProducts(String correlationId, Channel channel, T data) {
         try {
             List<Product> products = getProducts();
@@ -67,6 +72,8 @@ public class ProductDataService {
             e.printStackTrace();
         }
     }
+
+     */
     public <T> void editProduct(String correlationId, Channel channel, T data) {
         try {
             Product product = editProduct((Product) data);
@@ -144,7 +151,7 @@ public class ProductDataService {
         );
     }
 
-    private List<Product> getProducts() throws SQLException {
+    private List<Product> getProducts(Empty empty) throws SQLException {
         return helper.map(
             ProductDataService::createProduct,
         """
@@ -163,7 +170,7 @@ public class ProductDataService {
         int id = helper.executeUpdateWithGeneratedKeys(
         """
             INSERT INTO Products VALUES
-            (default, ?, ?, ?, ?)
+            (default, ?, ?, ?, ?, ?)
             """,
             product.getName(),
             product.getDescription(),

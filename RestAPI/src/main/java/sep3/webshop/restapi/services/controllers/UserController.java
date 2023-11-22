@@ -21,10 +21,10 @@ public class UserController {
         this.data = data;
     }
 
-    @GetMapping("/isAdmin")
-    public ResponseEntity<Boolean> isAdmin(@RequestBody User user) throws IOException {
-        Boolean isAdmin = data.isAdmin(user);
-        return new ResponseEntity<>(isAdmin, HttpStatus.OK);
+    @PostMapping()
+    public ResponseEntity<User> getUser(@RequestBody User user) throws IOException {
+        User registeredUser = data.getUser(user);
+        return new ResponseEntity<>(registeredUser, HttpStatus.OK);
     }
 
 }

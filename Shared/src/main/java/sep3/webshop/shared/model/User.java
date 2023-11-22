@@ -10,7 +10,6 @@ public class User implements Serializable {
 
     public User() {}
 
-
     public User(String username, String password, String email, String firstname, String lastname, Date dob) {
         this.username = username;
         this.password = password;

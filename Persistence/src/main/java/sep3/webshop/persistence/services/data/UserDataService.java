@@ -6,9 +6,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import sep3.webshop.persistence.services.messaging.RequestQueueListener;
 import sep3.webshop.persistence.services.messaging.ResponseSender;
-import sep3.webshop.shared.model.Order;
 import sep3.webshop.shared.model.User;
-import sep3.webshop.shared.utils.Printer;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -26,14 +24,12 @@ public class UserDataService {
     ) {
         this.helper = helper;
 
-        listener.on("isAdmin", this::isRegistered);
+        listener.on("getUser", this::getUser);
     }
-    public <T> void isRegistered(String correlationId, Channel channel, T data) {
+    public <T> void getUser(String correlationId, Channel channel, T data) {
         try {
-            User user = (User) data;
-            Boolean isRegistered = isRegistered(user.getUsername(), user.getPassword());
-
-            ResponseSender.sendResponse(isRegistered, correlationId, channel);
+            User registeredUser = isRegistered((User) data);
+            ResponseSender.sendResponse(registeredUser, correlationId, channel);
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -49,16 +45,15 @@ public class UserDataService {
             rs.getDate("birthdate")
         );
     }
-    public boolean isRegistered(String username, String password) throws SQLException {
-        User user = helper.mapSingle(
+    public User isRegistered(User user) throws SQLException {
+        return helper.mapSingle(
                 UserDataService::createUser,
-            """
-                SELECT * FROM Admins
-                WHERE username=? AND password=?
-                """,
-                username,
-                password
+                """
+                    SELECT * FROM Admins
+                    WHERE username=? AND password=?
+                    """,
+                user.getUsername(),
+                user.getPassword()
         );
-        return user != null;
     }
 }

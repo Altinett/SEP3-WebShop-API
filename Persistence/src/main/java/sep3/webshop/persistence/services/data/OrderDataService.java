@@ -35,27 +35,33 @@ public class OrderDataService {
 
     public <T> void getOrder(String correlationId, Channel channel, T data) {
         try {
-            Order order = getOrder((int) data);
-
-            ResponseSender.sendResponse(order, correlationId, channel);
+            ResponseSender.sendResponse(
+                getOrder((int) data),
+                correlationId,
+                channel
+            );
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }
     public <T> void getOrders(String correlationId, Channel channel, T data) {
         try {
-            List<Order> orders = getOrders();
-
-            ResponseSender.sendResponse(orders, correlationId, channel);
+            ResponseSender.sendResponse(
+                getOrders(),
+                correlationId,
+                channel
+            );
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }
     public <T> void createOrder(String correlationId, Channel channel, T data) {
         try {
-            Order createdOrder = createOrder((Order) data);
-
-            ResponseSender.sendResponse(createdOrder, correlationId, channel);
+            ResponseSender.sendResponse(
+                createOrder((Order) data),
+                correlationId,
+                channel
+            );
         } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
@@ -72,59 +78,68 @@ public class OrderDataService {
         return order;
     }
     private static Order createOrderWithoutProducts(ResultSet rs) throws SQLException {
-        int orderId = rs.getInt("id");
-        String firstname = rs.getString("firstname");
-        String lastname = rs.getString("lastname");
-        String address = rs.getString("address");
-        int postcode = rs.getInt("postcode");
-        boolean status = rs.getBoolean("status");
-        int total = rs.getInt("total");
-        int phoneNumber = rs.getInt("phonenumber");
-        String email = rs.getString("email");
-        return new Order(orderId, firstname, lastname, address, postcode, status, total, phoneNumber, email);
+        return new Order(
+            rs.getInt("id"),
+            rs.getString("firstname"),
+            rs.getString("lastname"),
+            rs.getString("address"),
+            rs.getInt("postcode"),
+            rs.getBoolean("status"),
+            rs.getInt("total"),
+            rs.getInt("phonenumber"),
+            rs.getString("email")
+        );
     }
     private List<Order> getOrders() throws SQLException {
         return helper.map(
-                OrderDataService::createOrder,
-                "SELECT o.*, string_agg(op.product_id::text, ',') AS product_ids " +
-                        "FROM Orders o " +
-                        "JOIN OrderProducts op ON o.id=op.order_id " +
-                        "GROUP BY o.id " +
-                        "ORDER BY o.id " +
-                        "LIMIT 40 "
+            OrderDataService::createOrder,
+        """
+            SELECT O.*, STRING_AGG(OP.product_id::TEXT, ',') AS product_ids
+            FROM Orders O
+            JOIN OrderProducts OP ON O.id=OP.order_id
+            GROUP BY O.id
+            ORDER BY O.id
+            LIMIT 40
+            """
         );
     }
     private Order getOrder(int orderId) throws SQLException {
         return helper.mapSingle(
-                OrderDataService::createOrder,
-                "SELECT * FROM ( " +
-                    "SELECT o.*, string_agg(op.product_id::text, ',') AS product_ids " +
-                    "FROM Orders o " +
-                    "JOIN OrderProducts op ON o.id=op.order_id " +
-                    "GROUP BY o.id " +
-                    "ORDER BY o.id " +
-                    ") AS orders " +
-                    "WHERE id=? ",
-                orderId
+            OrderDataService::createOrder,
+        """
+            SELECT * FROM (
+            SELECT O.*, STRING_AGG(OP.product_id::TEXT, ',') AS product_ids
+            FROM Orders O
+            JOIN OrderProducts OP ON O.id=OP.order_id
+            GROUP BY O.id
+            ORDER BY O.id
+            ) AS orders
+            WHERE id=?
+            """,
+            orderId
         );
     }
 
     private void updateTotal(int orderId) throws SQLException {
         helper.executeUpdate(
-                "UPDATE Orders SET total=(" +
-                        "SELECT SUM(P.price * OP.quantity) total "+
-                        "FROM Products P JOIN OrderProducts OP " +
-                        "ON P.id=OP.product_id AND OP.order_id=?"+
-                        ") WHERE id=?",
-                orderId,
-                orderId
+        """
+            UPDATE Orders SET total=(
+            SELECT SUM(P.price * OP.quantity) total
+            FROM Products P JOIN OrderProducts OP
+            ON P.id=OP.product_id AND OP.order_id=?
+            ) WHERE id=?
+            """,
+            orderId,
+            orderId
         );
     }
 
     private Order createOrder(Order order) throws SQLException {
         int id = helper.executeUpdateWithGeneratedKeys(
-            "INSERT INTO Orders " +
-            "VALUES(DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        """
+            INSERT INTO Orders
+            VALUES(DEFAULT, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """,
             order.getFirstname(),
             order.getLastname(),
             order.getAddress(),

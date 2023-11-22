@@ -7,16 +7,13 @@ import sep3.webshop.shared.utils.Observer;
 import java.io.IOException;
 import java.sql.SQLException;
 
-@FunctionalInterface
-interface Handler<T, R> {
-    R handle(T data) throws SQLException;
-}
 public class RequestHandler {
-    public static Observer createObserver(Handler handler) {
+    public static <T, R> Observer newObserver(Handler<T, R> handler) {
         return new Observer() {
-            @Override public <T> void update(String correlationId, Channel channel, T data) {
+            @Override public <Y> void update(String correlationId, Channel channel, Y data) {
                 try {
-                    ResponseSender.sendResponse(handler.handle(data), correlationId, channel);
+                    R result = handler.execute((T) data);
+                    ResponseSender.sendResponse(result, correlationId, channel);
                 } catch (SQLException | IOException e) {
                     e.printStackTrace();
                 }

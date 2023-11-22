@@ -19,8 +19,8 @@ public class UserDataService {
         this.requestHelper = requestHelper;
     }
 
-    public boolean isAdmin(User user) throws IOException {
-        CompletableFuture<Boolean> future = requestHelper.sendRequest("isAdmin", user);
+    public User getUser(User user) throws IOException {
+        CompletableFuture<User> future = requestHelper.sendRequest("getUser", user);
         return requestHelper.handleFuture(future);
     }
 }
