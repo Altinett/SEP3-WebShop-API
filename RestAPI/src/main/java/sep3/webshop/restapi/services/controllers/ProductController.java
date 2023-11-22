@@ -31,17 +31,32 @@ public class ProductController {
     }
 
     @PostMapping("/add")
-    public void addProduct(@RequestBody Product product) throws IOException {
-        data.addProduct(product);
+    public ResponseEntity<Product> addProduct(@RequestBody Product product) throws IOException {
+        Product addedProduct = data.addProduct(product);
+        return new ResponseEntity<>(addedProduct, HttpStatus.OK);
     }
 
     @PostMapping("/edit")
-    public void editProduct(@RequestBody Product product) throws IOException {
-        data.editProduct(product);
+    public ResponseEntity<Product> editProduct(@RequestBody Product product) throws IOException {
+        Product editedProduct = data.editProduct(product);
+        return new ResponseEntity<>(editedProduct, HttpStatus.OK);
+    }
+
+    @GetMapping("/fromOrder")
+    public ResponseEntity<List<Product>> getProductsByOrderId(@RequestParam int id) throws IOException {
+        List<Product> products = data.getProductsByOrderId(id);
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
     @DeleteMapping("/remove")
-    public void removeProduct(@RequestParam int id) throws IOException {
-        data.removeProduct(id);
+    public ResponseEntity<Product> removeProduct(@RequestParam int id) throws IOException {
+        Product product = data.removeProduct(id);
+        return new ResponseEntity<>(product, HttpStatus.OK);
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Product>> searchProducts(@RequestParam String query) throws IOException {
+        List<Product> products = data.searchProducts(query);
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 }

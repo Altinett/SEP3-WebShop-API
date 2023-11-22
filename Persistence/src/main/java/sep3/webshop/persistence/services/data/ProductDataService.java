@@ -1,6 +1,7 @@
 package sep3.webshop.persistence.services.data;
 
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.RpcClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,24 @@ public class ProductDataService {
         listener.on("addProduct", this::addProduct);
         listener.on("editProduct", this::editProduct);
         listener.on("removeProduct", this::removeProduct);
+        listener.on("searchProducts", this::searchProducts);
+        listener.on("getProductsByOrderId", this::getProductsByOrderId);
+    }
+    public <T> void getProductsByOrderId(String correlationId, Channel channel, T data) {
+        try {
+            List<Product> products = getProductsByOrderId((int) data);
+            ResponseSender.sendResponse(products, correlationId, channel);
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public <T> void searchProducts(String correlationId, Channel channel, T data) {
+        try {
+            List<Product> products = searchProducts((String) data);
+            ResponseSender.sendResponse(products, correlationId, channel);
+        } catch (SQLException | IOException e) {
+            e.printStackTrace();
+        }
     }
     public <T> void getProducts(String correlationId, Channel channel, T data) {
         try {
@@ -42,108 +61,148 @@ public class ProductDataService {
     }
     public <T> void addProduct(String correlationId, Channel channel, T data) {
         try {
-            addProduct((Product) data);
-        } catch (SQLException e) {
+            Product product = addProduct((Product) data);
+            ResponseSender.sendResponse(product, correlationId, channel);
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }
     public <T> void editProduct(String correlationId, Channel channel, T data) {
         try {
-            editProduct((Product) data);
-        } catch (SQLException e) {
+            Product product = editProduct((Product) data);
+            ResponseSender.sendResponse(product, correlationId, channel);
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
     }
     public <T> void removeProduct(String correlationId, Channel channel, T data) {
         try {
-            removeProduct((int) data);
-        } catch (SQLException e) {
+            Product product = removeProduct((int) data);
+            ResponseSender.sendResponse(product, correlationId, channel);
+        } catch (SQLException | IOException e) {
             e.printStackTrace();
         }
+    }
+    private List<Product> getProductsByOrderId(int orderId) throws SQLException {
+        return helper.map(
+                ProductDataService::createProduct,
+            """
+                    SELECT
+                        P.*,
+                        STRING_AGG(PC.category_id::TEXT, ',') AS category_ids
+                    FROM Products P
+                    JOIN ProductCategories PC ON P.id = PC.product_id
+                    JOIN OrderProducts O ON O.product_id=PC.product_id AND O.order_id=?
+                    GROUP BY P.id;
+                    """,
+                orderId
+
+        );
+    }
+
+    private List<Product> searchProducts(String query) throws SQLException {
+        return helper.map(
+            ProductDataService::createProduct,
+            """
+                SELECT
+                    P.*,
+                    STRING_AGG(PC.category_id::TEXT, ',') AS category_ids,
+                    LEVENSHTEIN(LOWER(name), LOWER(?)) / GREATEST(LENGTH(name), LENGTH(?))::FLOAT AS Distance
+                FROM Products P
+                JOIN ProductCategories PC ON P.id = PC.product_id
+                WHERE P.flagged=false
+                GROUP BY P.id
+                ORDER BY Distance ASC
+                LIMIT 20;
+                """,
+            query, query
+        );
     }
 
     private static Product createProduct(ResultSet rs) throws SQLException {
         Product product = ProductDataService.createProductWithoutCategoryIds(rs);
+
         try {
             List<Integer> productIds = new ArrayList<>();
             for (String id : rs.getString("category_ids").split(",")) {
                 productIds.add(Integer.parseInt(id));
             }
-            product.setCategoryIds(productIds);}
-        catch (Exception e){e.printStackTrace();}
+            product.setCategoryIds(productIds);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         return product;
     }
     private static Product createProductWithoutCategoryIds(ResultSet rs) throws SQLException {
-        int id = rs.getInt("id");
-        String name = rs.getString("name");
-        String description = rs.getString("description");
-        BigDecimal price = rs.getBigDecimal("price");
-        int amount = rs.getInt("amount");
-        return new Product(id, name, description, price, amount);
+        return new Product(
+            rs.getInt("id"),
+            rs.getString("name"),
+            rs.getString("description"),
+            rs.getBigDecimal("price"),
+            rs.getInt("amount")
+        );
     }
 
     private List<Product> getProducts() throws SQLException {
         return helper.map(
-                ProductDataService::createProduct,
-                "select p.*, string_agg(PC.category_id::text, ',') AS category_ids from products p " +
-                        "join ProductCategories PC on p.id = PC.product_id " +
-                        "group by p.id "+
-                        "order by p.id " +
-                        "limit 40 "
-        );
-    }
-    private Product getProduct(Product product) throws SQLException {
-        return helper.mapSingle(
-                ProductDataService::createProductWithoutCategoryIds,
-                "SELECT * FROM Products WHERE " +
-                        "name=? AND " +
-                        "description=? AND " +
-                        "price=? AND " +
-                        "amount=? " +
-                        "LIMIT 1",
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getAmount()
+            ProductDataService::createProduct,
+        """
+            SELECT P.*, STRING_AGG(PC.category_id::text, ',') AS category_ids FROM Products P
+            JOIN ProductCategories PC ON P.id = PC.product_id
+            WHERE P.flagged=false
+            GROUP BY P.id
+            ORDER BY P.id
+            LIMIT 40
+            """
         );
     }
 
-    private void addProduct(Product product) throws SQLException {
-        helper.executeUpdate(
-                "INSERT INTO Products VALUES " +
-                        "(default, ?, ?, ?, ?)",
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.getAmount()
-        );
 
-        // Save copy of category ids
+    private Product addProduct(Product product) throws SQLException {
+        int id = helper.executeUpdateWithGeneratedKeys(
+        """
+            INSERT INTO Products VALUES
+            (default, ?, ?, ?, ?)
+            """,
+            product.getName(),
+            product.getDescription(),
+            product.getPrice(),
+            product.getAmount(),
+            false
+        ).get(0);
+        product.setId(id);
+
         List<Integer> ids = product.getCategoryIds();
 
-        if (ids == null) return;
-
-        // Populate new product
-        product = this.getProduct(product);
+        if (ids == null) return product;
 
         // Add category ids into ProductCategories
-        int productId = product.getId();
         int idsLength = ids.size();
-        String query = "INSERT INTO ProductCategories VALUES ";
+        StringBuilder query = new StringBuilder("INSERT INTO ProductCategories VALUES ");
         for (int i = 0; i < idsLength; i++) {
             String endPrefix = i == idsLength-1 ? ";" : ",";
-            query += "(" + productId + ", " + ids.get(i) + ")" + endPrefix;
+            query.append("(").append(id).append(", ").append(ids.get(i)).append(")").append(endPrefix);
         }
-        helper.executeUpdate(query);
+        helper.executeUpdate(query.toString());
+
+        return product;
     }
-    private void removeProduct(int id) throws SQLException {
-        helper.executeUpdate("DELETE FROM Products WHERE id=?", id);
+    private Product removeProduct(int id) throws SQLException {
+        return helper.mapSingle(
+                ProductDataService::createProductWithoutCategoryIds,
+            "UPDATE Products SET flagged=true WHERE id=? RETURNING *",
+            id
+        );
     }
-    private void editProduct(Product product) throws SQLException {
-        helper.executeUpdate(
-                "UPDATE Products " +
-                        "SET name=?, description=?, price=?, amount=? "+
-                        "WHERE id=?",
+    private Product editProduct(Product product) throws SQLException {
+        return helper.mapSingle(
+                ProductDataService::createProductWithoutCategoryIds,
+            """
+                UPDATE Products
+                SET name=?, description=?, price=?, amount=?
+                WHERE id=? RETURNING *
+                """,
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),

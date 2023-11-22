@@ -12,7 +12,6 @@ public class Product implements Serializable {
 
     public Product() {}
 
-
     public Product(int id, String name, String description, BigDecimal price, int amount) {
         this.id = id;
         this.name = name;
@@ -30,6 +29,9 @@ public class Product implements Serializable {
 
     public int getId() {
         return id;
+    }
+    public void setId(int id) {
+        this.id = id;
     }
     public String getName() {
         return name;

@@ -1,68 +1,72 @@
-drop schema webshop cascade;
+DROP SCHEMA webshop CASCADE;
 
-Create schema "webshop";
+CREATE SCHEMA "webshop";
 
-set search_path = "webshop";
+SET search_path = "webshop";
 
-CREATE table Categories (
-    id int primary key,
-    name text not null
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch;
+
+
+CREATE TABLE Categories (
+                            id int primary key,
+                            name text not null
 );
 
-CREATE table Products (
-    id serial primary key,
-    name text not null,
-    description text not null,
-    price decimal not null,
-    amount int not null
+CREATE TABLE Products (
+                          id serial primary key,
+                          name text not null,
+                          description text not null,
+                          price decimal not null,
+                          amount int not null,
+                          flagged bool not null
 );
 
-CREATE table ProductCategories (
-    product_id int,
-    foreign key (product_id) references Products(id) on delete cascade,
-    category_id int,
-    foreign key (category_id) references Categories(id),
-    primary key (product_id, category_id)
+CREATE TABLE ProductCategories (
+                                   product_id int,
+                                   foreign key (product_id) references Products(id) on delete cascade,
+                                   category_id int,
+                                   foreign key (category_id) references Categories(id),
+                                   primary key (product_id, category_id)
 );
 
-CREATE table Cities (
-    postcode int primary key,
-    name text not null
+CREATE TABLE Cities (
+                        postcode int primary key,
+                        name text not null
 );
 
-CREATE table Orders (
-    id serial primary key,
-    firstname text not null,
-    lastname text not null,
-    address text not null,
-    postcode int not null,
-    date date not null,
-    status boolean not null,
-    total int not null,
-    phonenumber int not null,
-    email text not null,
+CREATE TABLE Orders (
+                        id serial primary key,
+                        firstname text not null,
+                        lastname text not null,
+                        address text not null,
+                        postcode int not null,
+                        date date not null,
+                        status boolean not null,
+                        total int not null,
+                        phonenumber int not null,
+                        email text not null,
 
-    foreign key (postcode) references Cities(postcode)
+                        foreign key (postcode) references Cities(postcode)
 );
 
 
-CREATE table OrderProducts (
-    order_id int,
-    foreign key (order_id) references Orders(id),
-    product_id int,
-    quantity int,
-    foreign key (product_id) references Products(id) on delete cascade,
-    primary key (order_id, product_id)
+CREATE TABLE OrderProducts (
+                               order_id int,
+                               foreign key (order_id) references Orders(id),
+                               product_id int,
+                               quantity int,
+                               foreign key (product_id) references Products(id) on delete cascade,
+                               primary key (order_id, product_id)
 );
 
-CREATE table Admins (
-    id int primary key,
-    username text not null,
-    password text not null,
-    email text not null,
-    birthdate date not null,
-    firstname text not null,
-    lastname text not null
+CREATE TABLE Admins (
+                        id int primary key,
+                        username text not null,
+                        password text not null,
+                        email text not null,
+                        birthdate date not null,
+                        firstname text not null,
+                        lastname text not null
 );
 
 
@@ -76,17 +80,17 @@ VALUES (1, 'Electronics'),
        (5, 'Sports');
 
 -- Insert dummy data for Vare table
-INSERT INTO Products (id, name, description, price, amount)
-VALUES (default, 'Smartphone', 'En mobil kommunikations- og computerenhed.', 500, 10),
-       (default, 'T-Shirt', 'En afslappet, kortærmet beklædningsgenstand ofte lavet af bomuld.', 20, 50),
-       (default, 'Pudebetræk', 'Et dekorativt stofbetræk til puder.', 15, 30),
-       (default, 'Novelle', 'En skønlitterær bog til historiefortælling og underholdning.', 10, 20),
-       (default, 'Fodbold', 'En kugleformet bold brugt i fodboldsporten.', 25, 15),
-       (default, 'Bærbar', 'En bærbar computer designet til mobilitet.', 800, 5),
-       (default, 'Jeans', 'En type slidstærke, afslappede bukser, der typisk er lavet af denim.', 30, 40),
-       (default, 'Bordlampe', 'Et lysarmatur placeret på borde eller skriveborde.', 25, 20),
-       (default, 'Kogebog', 'En bog med opskrifter og madlavningsvejledning.', 15, 15),
-       (default, 'Basketball', 'En kugleformet bold brugt i basketballsporten.', 20, 10);
+INSERT INTO Products (id, name, description, price, amount, flagged)
+VALUES (default, 'Smartphone', 'En mobil kommunikations- og computerenhed.', 500, 10, false),
+       (default, 'T-Shirt', 'En afslappet, kortærmet beklædningsgenstand ofte lavet af bomuld.', 20, 50, false),
+       (default, 'Pudebetræk', 'Et dekorativt stofbetræk til puder.', 15, 30, true),
+       (default, 'Novelle', 'En skønlitterær bog til historiefortælling og underholdning.', 10, 20, false),
+       (default, 'Fodbold', 'En kugleformet bold brugt i fodboldsporten.', 25, 15, false),
+       (default, 'Bærbar', 'En bærbar computer designet til mobilitet.', 800, 5, false),
+       (default, 'Jeans', 'En type slidstærke, afslappede bukser, der typisk er lavet af denim.', 30, 40, true),
+       (default, 'Bordlampe', 'Et lysarmatur placeret på borde eller skriveborde.', 25, 20, false),
+       (default, 'Kogebog', 'En bog med opskrifter og madlavningsvejledning.', 15, 15, false),
+       (default, 'Basketball', 'En kugleformet bold brugt i basketballsporten.', 20, 10, false);
 
 
 -- Insert dummy data for VareKatagori table
@@ -120,12 +124,12 @@ VALUES (default, 'John', 'Doe', 'Street 1', 1000, '2021-01-01', true, 100, 12345
 
 -- Insert dummy data for ordreVare table
 INSERT INTO OrderProducts
-VALUES (1, 1),
-       (2, 2),
-       (3, 3),
-       (4, 3),
-       (4, 4),
-       (5, 5);
+VALUES (1, 1, 1),
+       (2, 2, 2),
+       (3, 3, 2),
+       (4, 3, 2),
+       (4, 4, 2),
+       (5, 5, 4);
 
 -- Insert dummy data for Admin table
 INSERT INTO Admins
@@ -134,3 +138,5 @@ VALUES (1, 'admin1', 'password1', 'admin1@example.com', '1990-01-01', 'Admin', '
        (3, 'admin3', 'password3', 'admin3@example.com', '1985-03-03', 'Admin', 'Three'),
        (4, 'admin4', 'password4', 'admin4@example.com', '1980-04-04', 'Admin', 'Four'),
        (5, 'admin5', 'password5', 'admin5@example.com', '1992-05-05', 'Admin', 'Five');
+
+
