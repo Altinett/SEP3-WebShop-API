@@ -15,7 +15,6 @@ public class Order implements Serializable {
     private int total;
     private int phoneNumber;
     private String email;
-    private List<Integer> productIds;
     private Map<Integer, Integer> products;
 
     public Order() {}
@@ -50,25 +49,7 @@ public class Order implements Serializable {
         boolean status,
         int total,
         int phoneNumber,
-        String email,
-        List<Integer> productIds
-    ) {
-        this(firstname, lastname, address, postcode, status, total, phoneNumber, email);
-        this.orderId = orderId;
-        this.date = new Date(millis);
-        this.productIds = productIds;
-    }
-
-    public Order (
-            int orderId,
-            String firstname,
-            String lastname,
-            String address,
-            int postcode,
-            boolean status,
-            int total,
-            int phoneNumber,
-            String email
+        String email
     ) {
         this(firstname, lastname, address, postcode, status, total, phoneNumber, email);
         this.orderId = orderId;
@@ -85,12 +66,11 @@ public class Order implements Serializable {
             int total,
             int phoneNumber,
             String email,
-            Map<Integer, Integer> products
+            Date date
     ) {
         this(firstname, lastname, address, postcode, status, total, phoneNumber, email);
         this.orderId = orderId;
-        this.date = new Date(millis);
-        this.products = products;
+        this.date = date;
     }
 
     public void setOrderId(int orderId) {
@@ -135,13 +115,10 @@ public class Order implements Serializable {
         return postcode;
     }
 
-    public List<Integer> getProductIds() {
-        return productIds;
-    }
-    public void setProductIds(List<Integer> ids) {
-        productIds = ids;
-    }
     public Map<Integer, Integer> getProducts() {
         return products;
+    }
+    public void setProducts(Map<Integer, Integer> products) {
+        this.products = products;
     }
 }

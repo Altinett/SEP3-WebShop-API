@@ -1,20 +1,20 @@
 package sep3.webshop.persistence.services.data;
 
-import com.rabbitmq.client.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import sep3.webshop.persistence.services.messaging.ResponseSender;
 import sep3.webshop.persistence.services.messaging.RequestQueueListener;
+import sep3.webshop.persistence.utils.DatabaseHelper;
+import sep3.webshop.persistence.utils.Empty;
+import sep3.webshop.persistence.utils.RequestHandler;
 import sep3.webshop.shared.model.Order;
+import sep3.webshop.shared.utils.Printer;
+import sep3.webshop.shared.utils.StringConverter;
 
-import java.io.IOException;
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.*;
 
 @Component
 @Scope("singleton")
@@ -23,84 +23,34 @@ public class OrderDataService {
 
     @Autowired
     public OrderDataService(
-            DatabaseHelper<Order> helper,
-            RequestQueueListener listener
+        DatabaseHelper<Order> helper,
+        RequestQueueListener listener
     ) {
         this.helper = helper;
 
-        listener.on("getOrder", this::getOrder);
-        listener.on("getOrders", this::getOrders);
-        listener.on("createOrder", this::createOrder);
+        listener.on("getOrder", RequestHandler.newObserver(this::getOrder));
+        listener.on("getOrders", RequestHandler.newObserver(this::getOrders));
+        listener.on("createOrder", RequestHandler.newObserver(this::newOrder));
     }
-
-    public <T> void getOrder(String correlationId, Channel channel, T data) {
-        try {
-            ResponseSender.sendResponse(
-                getOrder((int) data),
-                correlationId,
-                channel
-            );
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public <T> void getOrders(String correlationId, Channel channel, T data) {
-        try {
-            ResponseSender.sendResponse(
-                getOrders(),
-                correlationId,
-                channel
-            );
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-    public <T> void createOrder(String correlationId, Channel channel, T data) {
-        try {
-            ResponseSender.sendResponse(
-                createOrder((Order) data),
-                correlationId,
-                channel
-            );
-        } catch (SQLException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    private static Order createOrder(ResultSet rs) throws SQLException {
-        Order order = OrderDataService.createOrderWithoutProducts(rs);
-        List<Integer> productIds = new ArrayList<>();
-        for (String id : rs.getString("product_ids").split(",")) {
-            productIds.add(Integer.parseInt(id));
-        }
-        order.setProductIds(productIds);
-        return order;
-    }
-    private static Order createOrderWithoutProducts(ResultSet rs) throws SQLException {
-        return new Order(
-            rs.getInt("id"),
-            rs.getString("firstname"),
-            rs.getString("lastname"),
-            rs.getString("address"),
-            rs.getInt("postcode"),
-            rs.getBoolean("status"),
-            rs.getInt("total"),
-            rs.getInt("phonenumber"),
-            rs.getString("email")
-        );
-    }
-    private List<Order> getOrders() throws SQLException {
+    private List<Order> getOrders(Empty empty) throws SQLException {
         return helper.map(
             OrderDataService::createOrder,
         """
-            SELECT O.*, STRING_AGG(OP.product_id::TEXT, ',') AS product_ids
-            FROM Orders O
-            JOIN OrderProducts OP ON O.id=OP.order_id
-            GROUP BY O.id
-            ORDER BY O.id
-            LIMIT 40
-            """
+                /*
+                SELECT O.*, STRING_AGG(OP.product_id::TEXT, ',') AS product_ids
+                FROM Orders O
+                JOIN OrderProducts OP ON O.id=OP.order_id
+                GROUP BY O.id
+                ORDER BY O.id
+                LIMIT 40
+                */
+                SELECT O.*, ARRAY_AGG(ARRAY[OP.product_id, OP.quantity]) AS products
+                FROM Orders O
+                JOIN OrderProducts OP ON O.id=OP.order_id
+                GROUP BY O.id
+                ORDER BY O.id
+                LIMIT 40;
+                """
         );
     }
     private Order getOrder(int orderId) throws SQLException {
@@ -108,11 +58,11 @@ public class OrderDataService {
             OrderDataService::createOrder,
         """
             SELECT * FROM (
-            SELECT O.*, STRING_AGG(OP.product_id::TEXT, ',') AS product_ids
-            FROM Orders O
-            JOIN OrderProducts OP ON O.id=OP.order_id
-            GROUP BY O.id
-            ORDER BY O.id
+                SELECT O.*, ARRAY_AGG(ARRAY[OP.product_id, OP.quantity]) AS products
+                FROM Orders O
+                JOIN OrderProducts OP ON O.id=OP.order_id
+                GROUP BY O.id
+                ORDER BY O.id
             ) AS orders
             WHERE id=?
             """,
@@ -124,17 +74,16 @@ public class OrderDataService {
         helper.executeUpdate(
         """
             UPDATE Orders SET total=(
-            SELECT SUM(P.price * OP.quantity) total
-            FROM Products P JOIN OrderProducts OP
-            ON P.id=OP.product_id AND OP.order_id=?
+                SELECT SUM(P.price * OP.quantity) as total
+                FROM Products P
+                JOIN OrderProducts OP ON P.id=OP.product_id AND OP.order_id=?
             ) WHERE id=?
             """,
-            orderId,
-            orderId
+            orderId, orderId
         );
     }
 
-    private Order createOrder(Order order) throws SQLException {
+    private Order newOrder(Order order) throws SQLException {
         int id = helper.executeUpdateWithGeneratedKeys(
         """
             INSERT INTO Orders
@@ -158,10 +107,37 @@ public class OrderDataService {
             query.append("(").append(id).append(", ").append(key).append(", ").append(products.get(key)).append("),");
         }
         helper.executeUpdate(query.substring(0, query.length() - 1));
-
         updateTotal(id);
 
         return order;
     }
 
+    private static Order createOrder(ResultSet rs) throws SQLException {
+        List<List<Integer>> _products = StringConverter.to2DArray(
+                String.valueOf(rs.getArray("products"))
+        );
+
+        Map<Integer, Integer> products = new HashMap<>();
+        for (List<Integer> product : _products) {
+            products.put(product.get(0), product.get(1));
+        }
+        Order order = OrderDataService.createOrderWithoutProducts(rs);
+        order.setProducts(products);
+
+        return order;
+    }
+    private static Order createOrderWithoutProducts(ResultSet rs) throws SQLException {
+        return new Order(
+            rs.getInt("id"),
+            rs.getString("firstname"),
+            rs.getString("lastname"),
+            rs.getString("address"),
+            rs.getInt("postcode"),
+            rs.getBoolean("status"),
+            rs.getInt("total"),
+            rs.getInt("phonenumber"),
+            rs.getString("email"),
+            rs.getDate("date")
+        );
+    }
 }

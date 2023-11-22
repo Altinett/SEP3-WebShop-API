@@ -1,4 +1,4 @@
-package sep3.webshop.persistence.services.data;
+package sep3.webshop.persistence.utils;
 
 import com.rabbitmq.client.Channel;
 import sep3.webshop.persistence.services.messaging.ResponseSender;

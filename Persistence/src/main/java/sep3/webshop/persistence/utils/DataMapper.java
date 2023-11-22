@@ -1,4 +1,4 @@
-package sep3.webshop.persistence.services.data;
+package sep3.webshop.persistence.utils;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
