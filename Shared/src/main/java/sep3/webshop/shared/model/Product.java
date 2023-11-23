@@ -8,19 +8,21 @@ public class Product implements Serializable {
     private int id, amount;
     private String name, description;
     private BigDecimal price;
+    private String image;
     private List<Integer> categoryIds;
 
     public Product() {}
 
-    public Product(int id, String name, String description, BigDecimal price, int amount) {
+    public Product(int id, String name, String description, BigDecimal price, int amount, String image) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.amount = amount;
+        this.image = image;
     }
-    public Product(int id, String name, String description, BigDecimal price, List<Integer> categoryIds, int amount) {
-        this(id, name, description, price, amount);
+    public Product(int id, String name, String description, BigDecimal price, List<Integer> categoryIds, int amount, String image) {
+        this(id, name, description, price, amount, image);
         this.categoryIds = categoryIds;
     }
     public void setCategoryIds(List<Integer> categoryIds) {
@@ -47,5 +49,8 @@ public class Product implements Serializable {
     }
     public int getAmount() {
         return amount;
+    }
+    public String getImage() {
+        return image;
     }
 }

@@ -18,7 +18,8 @@ CREATE TABLE Products (
                           description text not null,
                           price decimal not null,
                           amount int not null,
-                          flagged bool not null
+                          flagged bool not null,
+                          image text not null
 );
 
 CREATE TABLE ProductCategories (
