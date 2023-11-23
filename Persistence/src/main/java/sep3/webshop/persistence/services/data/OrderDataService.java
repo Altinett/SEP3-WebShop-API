@@ -125,7 +125,7 @@ public class OrderDataService {
             rs.getInt("total"),
             rs.getInt("phonenumber"),
             rs.getString("email"),
-            rs.getDate("date")
+            rs.getTimestamp("date")
         );
     }
 }

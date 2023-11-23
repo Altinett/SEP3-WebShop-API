@@ -40,7 +40,7 @@ CREATE TABLE Orders (
                         lastname text not null,
                         address text not null,
                         postcode int not null,
-                        date date not null,
+                        date timestamp not null,
                         status boolean not null,
                         total int not null,
                         phonenumber int not null,

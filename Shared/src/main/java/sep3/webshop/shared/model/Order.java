@@ -2,6 +2,7 @@ package sep3.webshop.shared.model;
 
 import java.io.Serializable;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Map;
 
 public class Order implements Serializable {
@@ -9,7 +10,7 @@ public class Order implements Serializable {
     private int orderId;
     private String firstname, lastname, address;
     private int postcode;
-    private Date date = new Date(millis);
+    private Timestamp date = new Timestamp(millis);
     private boolean status;
     private int total;
     private int phoneNumber;
@@ -27,10 +28,10 @@ public class Order implements Serializable {
         this.total = total;
         this.phoneNumber = phoneNumber;
         this.email = email;
-        this.date = new Date(millis);
+        this.date = new Timestamp(millis);
     }
 
-    public Order (int orderId, String firstname, String lastname, String address, int postcode, boolean status, int total, int phoneNumber, String email, Date date) {
+    public Order (int orderId, String firstname, String lastname, String address, int postcode, boolean status, int total, int phoneNumber, String email, Timestamp date) {
         this(firstname, lastname, address, postcode, status, total, phoneNumber, email);
         this.orderId = orderId;
         this.date = date;
@@ -43,9 +44,9 @@ public class Order implements Serializable {
         this.orderId = orderId;
     }
 
-    public Date getDate() {
+    public Timestamp getDate() {
         if (date == null) {
-            date = new Date(millis);
+            date = new Timestamp(millis);
         }
         return date;
     }
