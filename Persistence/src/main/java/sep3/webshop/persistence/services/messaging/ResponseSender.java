@@ -18,6 +18,6 @@ public class ResponseSender {
                         .correlationId(correlationId)
                         .build(),
                 ObjectSerializer.serialize(obj));
-        Printer.log("[INFO] RESPONSE SENT: " + correlationId);
+        Printer.log("[INFO] [" + correlationId + "] RESPONSE SENT");
     }
 }

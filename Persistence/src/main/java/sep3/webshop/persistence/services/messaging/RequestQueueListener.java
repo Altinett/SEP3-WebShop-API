@@ -24,10 +24,10 @@ public class RequestQueueListener implements RequestSubject {
         @Header(AmqpHeaders.CORRELATION_ID) String correlationId,
         Channel channel
     ) throws IOException, ClassNotFoundException {
-        Printer.log("[INFO] REQUEST RECEVIED: " + correlationId);
-
-        // Reconstruct order request
         RequestMessage<?> requestMessage = ObjectSerializer.deserialize(messageBody);
+
+        Printer.log("[INFO] [" + correlationId + "] REQUESTED " + requestMessage.getRequest());
+        Printer.log("[INFO] [" + correlationId + "] PAYLOAD: " + Printer.toString(requestMessage.getPayload()));
 
         emit(
             requestMessage.getRequest(),
@@ -35,7 +35,6 @@ public class RequestQueueListener implements RequestSubject {
             channel,
             requestMessage
         );
-        Printer.print(requestMessage.getPayload());
     }
 
     @Override

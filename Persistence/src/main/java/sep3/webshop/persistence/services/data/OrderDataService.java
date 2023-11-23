@@ -8,8 +8,6 @@ import sep3.webshop.persistence.utils.DatabaseHelper;
 import sep3.webshop.persistence.utils.Empty;
 import sep3.webshop.persistence.utils.RequestHandler;
 import sep3.webshop.shared.model.Order;
-import sep3.webshop.shared.utils.Printer;
-import sep3.webshop.shared.utils.StringConverter;
 
 import java.sql.Array;
 import java.sql.ResultSet;
@@ -36,14 +34,6 @@ public class OrderDataService {
         return helper.map(
             OrderDataService::createOrder,
         """
-                /*
-                SELECT O.*, STRING_AGG(OP.product_id::TEXT, ',') AS product_ids
-                FROM Orders O
-                JOIN OrderProducts OP ON O.id=OP.order_id
-                GROUP BY O.id
-                ORDER BY O.id
-                LIMIT 40
-                */
                 SELECT O.*, ARRAY_AGG(ARRAY[OP.product_id, OP.quantity]) AS products
                 FROM Orders O
                 JOIN OrderProducts OP ON O.id=OP.order_id
@@ -113,13 +103,11 @@ public class OrderDataService {
     }
 
     private static Order createOrder(ResultSet rs) throws SQLException {
-        List<List<Integer>> _products = StringConverter.to2DArray(
-                String.valueOf(rs.getArray("products"))
-        );
-
         Map<Integer, Integer> products = new HashMap<>();
-        for (List<Integer> product : _products) {
-            products.put(product.get(0), product.get(1));
+        Array arr = rs.getArray("products");
+        Integer[][] intArray = (Integer[][]) arr.getArray();
+        for(Integer[] row : intArray) {
+            products.put(row[0], row[1]);
         }
         Order order = OrderDataService.createOrderWithoutProducts(rs);
         order.setProducts(products);

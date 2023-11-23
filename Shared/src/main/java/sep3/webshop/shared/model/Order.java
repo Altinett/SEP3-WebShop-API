@@ -44,6 +44,9 @@ public class Order implements Serializable {
     }
 
     public Date getDate() {
+        if (date == null) {
+            date = new Date(millis);
+        }
         return date;
     }
     public boolean getStatus() {
