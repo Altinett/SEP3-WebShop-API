@@ -88,14 +88,15 @@ public class ProductDataService {
         int id = helper.executeUpdateWithGeneratedKeys(
         """
             INSERT INTO Products VALUES
-            (default, ?, ?, ?, ?, ?, ?)
+            (default, ?, ?, ?, ?, ?, ?, ?)
             """,
             product.getName(),
             product.getDescription(),
             product.getPrice(),
             product.getAmount(),
             false,
-            product.getImage()
+            product.getImage(),
+            product.isFlagged()
         ).get(0);
         product.setId(id);
 
@@ -124,7 +125,7 @@ public class ProductDataService {
                 ProductDataService::createProductWithoutCategoryIds,
             """
                 UPDATE Products
-                SET name=?, description=?, price=?, amount=?, image=?
+                SET name=?, description=?, price=?, amount=?, image=?, flagged=?
                 WHERE id=? RETURNING *
                 """,
                 product.getName(),
@@ -132,6 +133,7 @@ public class ProductDataService {
                 product.getPrice(),
                 product.getAmount(),
                 product.getImage(),
+                product.isFlagged(),
                 product.getId()
         );
     }
@@ -158,7 +160,8 @@ public class ProductDataService {
                 rs.getString("description"),
                 rs.getBigDecimal("price"),
                 rs.getInt("amount"),
-                rs.getString("image")
+                rs.getString("image"),
+                rs.getBoolean("flagged")
         );
     }
 }

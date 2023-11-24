@@ -10,19 +10,21 @@ public class Product implements Serializable {
     private BigDecimal price;
     private String image;
     private List<Integer> categoryIds;
+    private boolean flagged;
 
     public Product() {}
 
-    public Product(int id, String name, String description, BigDecimal price, int amount, String image) {
+    public Product(int id, String name, String description, BigDecimal price, int amount, String image, boolean flagged) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.amount = amount;
         this.image = image;
+        this.flagged = flagged;
     }
-    public Product(int id, String name, String description, BigDecimal price, List<Integer> categoryIds, int amount, String image) {
-        this(id, name, description, price, amount, image);
+    public Product(int id, String name, String description, BigDecimal price, List<Integer> categoryIds, int amount, String image, boolean flagged) {
+        this(id, name, description, price, amount, image ,flagged);
         this.categoryIds = categoryIds;
     }
     public void setCategoryIds(List<Integer> categoryIds) {
@@ -52,5 +54,8 @@ public class Product implements Serializable {
     }
     public String getImage() {
         return image;
+    }
+    public boolean isFlagged() {
+        return flagged;
     }
 }
