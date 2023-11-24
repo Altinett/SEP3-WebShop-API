@@ -79,17 +79,21 @@ public class ProductDataService {
         );
     }
 
-    private List<Product> getProducts(Empty empty) throws SQLException {
+    private List<Product> getProducts(Boolean showFlagged) throws SQLException {
         return helper.map(
             ProductDataService::createProduct,
         """
-            SELECT P.*, STRING_AGG(PC.category_id::text, ',') AS category_ids FROM Products P
+            SELECT P.*, STRING_AGG(PC.category_id::text, ',') AS category_ids
+            FROM Products P
             JOIN ProductCategories PC ON P.id = PC.product_id
-            WHERE P.flagged=false
+            WHERE
+                (?) OR
+                (NOT ? AND P.flagged = FALSE)
             GROUP BY P.id
             ORDER BY P.id
-            LIMIT 40
-            """
+            LIMIT 40;
+            """,
+            showFlagged, showFlagged
         );
     }
 

@@ -25,8 +25,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getProducts(@RequestParam boolean showFlagged) throws IOException {
-        List<Product> products = data.getProducts();
+    public ResponseEntity<List<Product>> getProducts(
+            @RequestParam(required = false, defaultValue = "true") boolean showFlagged
+    ) throws IOException {
+        List<Product> products = data.getProducts(showFlagged);
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
     @GetMapping("/{id}")

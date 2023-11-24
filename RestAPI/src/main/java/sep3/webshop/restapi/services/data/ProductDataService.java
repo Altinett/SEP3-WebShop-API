@@ -26,8 +26,8 @@ public class ProductDataService {
         this.requestHelper = requestHelper;
     }
 
-    public List<Product> getProducts() throws IOException {
-        CompletableFuture<List<Product>> future = requestHelper.sendRequest("getProducts");
+    public List<Product> getProducts(boolean showFlagged) throws IOException {
+        CompletableFuture<List<Product>> future = requestHelper.sendRequest("getProducts", showFlagged);
         return requestHelper.handleFuture(future);
     }
     public Product addProduct(Product product) throws IOException {
