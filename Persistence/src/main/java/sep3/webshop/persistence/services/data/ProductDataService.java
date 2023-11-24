@@ -8,11 +8,14 @@ import sep3.webshop.persistence.utils.DatabaseHelper;
 import sep3.webshop.persistence.utils.Empty;
 import sep3.webshop.persistence.utils.RequestHandler;
 import sep3.webshop.shared.model.Product;
+import sep3.webshop.shared.utils.Printer;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 @Scope("singleton")
@@ -79,22 +82,32 @@ public class ProductDataService {
         );
     }
 
-    private List<Product> getProducts(Boolean showFlagged) throws SQLException {
-        return helper.map(
+    private List<Product> getProducts(Map<String, Object> args) throws SQLException {
+        Boolean showFlagged = (Boolean) args.get("showFlagged");
+        List<Integer> categories = (List<Integer>) args.get("categories");
+        List<Product> products = helper.map(
             ProductDataService::createProduct,
         """
             SELECT P.*, STRING_AGG(PC.category_id::text, ',') AS category_ids
             FROM Products P
             JOIN ProductCategories PC ON P.id = PC.product_id
             WHERE
-                (?) OR
-                (NOT ? AND P.flagged = FALSE)
+                -- Whether to show/hide flagged products
+                (? OR (NOT ? AND P.flagged = FALSE))
             GROUP BY P.id
             ORDER BY P.id
             LIMIT 40;
             """,
             showFlagged, showFlagged
         );
+        if (!categories.isEmpty()) {
+            return products.stream().filter(
+                    product -> categories.stream().anyMatch(
+                            category -> product.getCategoryIds().contains(category)
+                    )
+            ).toList();
+        }
+        return products;
     }
 
     private Product addProduct(Product product) throws SQLException {

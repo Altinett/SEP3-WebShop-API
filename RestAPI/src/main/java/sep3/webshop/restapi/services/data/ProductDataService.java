@@ -14,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Component
@@ -26,8 +27,8 @@ public class ProductDataService {
         this.requestHelper = requestHelper;
     }
 
-    public List<Product> getProducts(boolean showFlagged) throws IOException {
-        CompletableFuture<List<Product>> future = requestHelper.sendRequest("getProducts", showFlagged);
+    public List<Product> getProducts(Map<String, Object> args) throws IOException {
+        CompletableFuture<List<Product>> future = requestHelper.sendRequest("getProducts", args);
         return requestHelper.handleFuture(future);
     }
     public Product addProduct(Product product) throws IOException {

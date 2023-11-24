@@ -1,17 +1,17 @@
 package sep3.webshop.restapi.services.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import sep3.webshop.restapi.services.data.ProductDataService;
 import sep3.webshop.shared.model.Product;
+import sep3.webshop.shared.utils.Printer;
 
 import java.io.IOException;
-import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @CrossOrigin
@@ -26,9 +26,16 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<Product>> getProducts(
-            @RequestParam(required = false, defaultValue = "true") boolean showFlagged
+            @RequestParam(required = false, defaultValue = "true") boolean showFlagged,
+            @RequestParam(required = false, defaultValue = "") List<Integer> categories
     ) throws IOException {
-        List<Product> products = data.getProducts(showFlagged);
+        Map<String, Object> args = new HashMap<>();
+        args.put("showFlagged", showFlagged);
+        args.put("categories", categories);
+
+        Printer.print(args);
+
+        List<Product> products = data.getProducts(args);
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
     @GetMapping("/{id}")
