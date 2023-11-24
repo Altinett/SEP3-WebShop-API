@@ -3,6 +3,7 @@ package sep3.webshop.restapi.services.data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestParam;
 import sep3.webshop.restapi.services.messaging.RequestHelper;
 import sep3.webshop.shared.model.Order;
 import sep3.webshop.shared.model.Product;
@@ -31,6 +32,10 @@ public class ProductDataService {
     }
     public Product addProduct(Product product) throws IOException {
         CompletableFuture<Product> future = requestHelper.sendRequest("addProduct", product);
+        return requestHelper.handleFuture(future);
+    }
+    public Product getProduct(int id) throws IOException {
+        CompletableFuture<Product> future = requestHelper.sendRequest("getProduct", id);
         return requestHelper.handleFuture(future);
     }
     public Product editProduct(Product product) throws IOException {

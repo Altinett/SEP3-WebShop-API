@@ -27,11 +27,20 @@ public class ProductDataService {
         this.helper = helper;
 
         listener.on("addProduct", RequestHandler.newObserver(this::addProduct));
+        listener.on("getProduct", RequestHandler.newObserver(this::getProduct));
         listener.on("getProducts", RequestHandler.newObserver(this::getProducts));
         listener.on("editProduct", RequestHandler.newObserver(this::editProduct));
         listener.on("removeProduct", RequestHandler.newObserver(this::removeProduct));
         listener.on("searchProducts", RequestHandler.newObserver(this::searchProducts));
         listener.on("getProductsByOrderId", RequestHandler.newObserver(this::getProductsByOrderId));
+    }
+
+    private Product getProduct(int id) throws SQLException {
+        return helper.mapSingle(
+            ProductDataService::createProduct,
+            "SELECT * FROM Products WHERE id=?",
+            id
+        );
     }
 
     private List<Product> getProductsByOrderId(int orderId) throws SQLException {

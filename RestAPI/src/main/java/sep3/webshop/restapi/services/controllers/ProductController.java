@@ -25,9 +25,14 @@ public class ProductController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Product>> getProducts() throws IOException {
+    public ResponseEntity<List<Product>> getProducts(@RequestParam boolean showFlagged) throws IOException {
         List<Product> products = data.getProducts();
         return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getProduct(@PathVariable int id) throws IOException {
+        Product product = data.getProduct(id);
+        return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
     @PostMapping("/add")
