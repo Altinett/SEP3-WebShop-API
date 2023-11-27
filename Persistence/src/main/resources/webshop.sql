@@ -81,17 +81,17 @@ VALUES (1, 'Electronics'),
        (5, 'Sports');
 
 -- Insert dummy data for Vare table
-INSERT INTO Products (id, name, description, price, amount, flagged)
-VALUES (default, 'Smartphone', 'En mobil kommunikations- og computerenhed.', 500, 10, false),
-       (default, 'T-Shirt', 'En afslappet, kortærmet beklædningsgenstand ofte lavet af bomuld.', 20, 50, false),
-       (default, 'Pudebetræk', 'Et dekorativt stofbetræk til puder.', 15, 30, true),
-       (default, 'Novelle', 'En skønlitterær bog til historiefortælling og underholdning.', 10, 20, false),
-       (default, 'Fodbold', 'En kugleformet bold brugt i fodboldsporten.', 25, 15, false),
-       (default, 'Bærbar', 'En bærbar computer designet til mobilitet.', 800, 5, false),
-       (default, 'Jeans', 'En type slidstærke, afslappede bukser, der typisk er lavet af denim.', 30, 40, true),
-       (default, 'Bordlampe', 'Et lysarmatur placeret på borde eller skriveborde.', 25, 20, false),
-       (default, 'Kogebog', 'En bog med opskrifter og madlavningsvejledning.', 15, 15, false),
-       (default, 'Basketball', 'En kugleformet bold brugt i basketballsporten.', 20, 10, false);
+INSERT INTO Products (id, name, description, price, amount, flagged, image)
+VALUES (default, 'Smartphone', 'En mobil kommunikations- og computerenhed.', 500, 10, false, ''),
+       (default, 'T-Shirt', 'En afslappet, kortærmet beklædningsgenstand ofte lavet af bomuld.', 20, 50, false, ''),
+       (default, 'Pudebetræk', 'Et dekorativt stofbetræk til puder.', 15, 30, true, ''),
+       (default, 'Novelle', 'En skønlitterær bog til historiefortælling og underholdning.', 10, 20, false, ''),
+       (default, 'Fodbold', 'En kugleformet bold brugt i fodboldsporten.', 25, 15, false, ''),
+       (default, 'Bærbar', 'En bærbar computer designet til mobilitet.', 800, 5, false, ''),
+       (default, 'Jeans', 'En type slidstærke, afslappede bukser, der typisk er lavet af denim.', 30, 40, true, ''),
+       (default, 'Bordlampe', 'Et lysarmatur placeret på borde eller skriveborde.', 25, 20, false, ''),
+       (default, 'Kogebog', 'En bog med opskrifter og madlavningsvejledning.', 15, 15, false, ''),
+       (default, 'Basketball', 'En kugleformet bold brugt i basketballsporten.', 20, 10, false, '');
 
 
 -- Insert dummy data for VareKatagori table

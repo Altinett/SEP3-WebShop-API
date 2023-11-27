@@ -6,6 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import sep3.webshop.persistence.utils.DatabaseHelper;
+import sep3.webshop.shared.model.Category;
 import sep3.webshop.shared.model.User;
 import sep3.webshop.shared.model.Order;
 import sep3.webshop.shared.model.Product;
@@ -33,6 +34,14 @@ public class Config {
     public DatabaseHelper<User> getUserHelper() {
         return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
     }
+
+    @Bean
+    @Scope("singleton")
+    public DatabaseHelper<Category> getCategoryHelper() {
+        return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
+    }
+
+
 
     @Bean
     public Queue requestQueue() {
