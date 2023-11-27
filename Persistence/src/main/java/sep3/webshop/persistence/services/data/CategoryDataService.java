@@ -26,6 +26,14 @@ public class CategoryDataService {
         this.helper = helper;
 
         listener.on("getCategories", RequestHandler.newObserver(this::getCategories));
+        listener.on("getCategory", RequestHandler.newObserver(this::getCategory));
+    }
+    private Category getCategory(int id) throws SQLException {
+        return helper.mapSingle(
+                CategoryDataService::createCategory,
+                "SELECT * FROM Categories WHERE id=? LIMIT 1",
+                id
+        );
     }
 
     private List<Category> getCategories(Empty empty) throws SQLException {

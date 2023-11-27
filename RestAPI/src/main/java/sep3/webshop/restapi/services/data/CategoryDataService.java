@@ -27,4 +27,9 @@ public class CategoryDataService {
         return requestHelper.handleFuture(future);
     }
 
+    public Category getCategory(int id) throws IOException {
+        CompletableFuture<Category> future = requestHelper.sendRequest("getCategory", id);
+        return requestHelper.handleFuture(future);
+    }
+
 }
