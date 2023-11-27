@@ -34,7 +34,6 @@ public class ProductDataService {
         listener.on("getProducts", RequestHandler.newObserver(this::getProducts));
         listener.on("editProduct", RequestHandler.newObserver(this::editProduct));
         listener.on("removeProduct", RequestHandler.newObserver(this::removeProduct));
-        listener.on("searchProducts", RequestHandler.newObserver(this::searchProducts));
         listener.on("getProductsByOrderId", RequestHandler.newObserver(this::getProductsByOrderId));
     }
 
@@ -63,41 +62,34 @@ public class ProductDataService {
         );
     }
 
-    private List<Product> searchProducts(String query) throws SQLException {
-        return helper.map(
-            ProductDataService::createProduct,
-            """
-                SELECT
-                    P.*,
-                    STRING_AGG(PC.category_id::TEXT, ',') AS category_ids,
-                    LEVENSHTEIN(LOWER(name), LOWER(?)) / GREATEST(LENGTH(name), LENGTH(?))::FLOAT AS Distance
-                FROM Products P
-                JOIN ProductCategories PC ON P.id = PC.product_id
-                WHERE P.flagged=false
-                GROUP BY P.id
-                ORDER BY Distance ASC
-                LIMIT 20;
-                """,
-            query, query
-        );
-    }
-
     private List<Product> getProducts(Map<String, Object> args) throws SQLException {
+        String query = (String) args.get("query");
         Boolean showFlagged = (Boolean) args.get("showFlagged");
         List<Integer> categories = (List<Integer>) args.get("categories");
-        List<Product> products = helper.map(
-            ProductDataService::createProduct,
-        """
-            SELECT P.*, STRING_AGG(PC.category_id::text, ',') AS category_ids
+
+        String sqlQuery = """
+            SELECT
+                P.*,
+                STRING_AGG(PC.category_id::text, ',') AS category_ids,
+                LEVENSHTEIN(LOWER(name), LOWER(?)) / GREATEST(LENGTH(name), LENGTH(?))::FLOAT AS Distance
             FROM Products P
             JOIN ProductCategories PC ON P.id = PC.product_id
             WHERE
                 -- Whether to show/hide flagged products
                 (? OR (NOT ? AND P.flagged = FALSE))
             GROUP BY P.id
-            ORDER BY P.id
-            LIMIT 40;
-            """,
+            """;
+        if (query.isEmpty()) {
+            sqlQuery += " ORDER BY P.id";
+        } else {
+            sqlQuery += " ORDER BY Distance";
+        }
+        sqlQuery += " LIMIT 40";
+
+        List<Product> products = helper.map(
+            ProductDataService::createProduct,
+            sqlQuery,
+            query, query,
             showFlagged, showFlagged
         );
         if (!categories.isEmpty()) {
@@ -114,15 +106,14 @@ public class ProductDataService {
         int id = helper.executeUpdateWithGeneratedKeys(
         """
             INSERT INTO Products VALUES
-            (default, ?, ?, ?, ?, ?, ?, ?)
+            (default, ?, ?, ?, ?, ?, ?)
             """,
             product.getName(),
             product.getDescription(),
             product.getPrice(),
             product.getAmount(),
             false,
-            product.getImage(),
-            product.isFlagged()
+            product.getImage()
         ).get(0);
         product.setId(id);
 

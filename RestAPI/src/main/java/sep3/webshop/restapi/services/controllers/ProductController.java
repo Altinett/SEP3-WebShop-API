@@ -27,11 +27,13 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<Product>> getProducts(
             @RequestParam(required = false, defaultValue = "true") boolean showFlagged,
-            @RequestParam(required = false, defaultValue = "") List<Integer> categories
+            @RequestParam(required = false, defaultValue = "") List<Integer> categories,
+            @RequestParam(required = false, defaultValue = "") String query
     ) throws IOException {
         Map<String, Object> args = new HashMap<>();
         args.put("showFlagged", showFlagged);
         args.put("categories", categories);
+        args.put("query", query);
 
         Printer.print(args);
 
@@ -66,11 +68,5 @@ public class ProductController {
     public ResponseEntity<Product> removeProduct(@RequestParam int id) throws IOException {
         Product product = data.removeProduct(id);
         return new ResponseEntity<>(product, HttpStatus.OK);
-    }
-
-    @GetMapping("/search")
-    public ResponseEntity<List<Product>> searchProducts(@RequestParam String query) throws IOException {
-        List<Product> products = data.searchProducts(query);
-        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 }

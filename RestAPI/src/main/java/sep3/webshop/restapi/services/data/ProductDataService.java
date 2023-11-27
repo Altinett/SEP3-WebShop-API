@@ -47,10 +47,6 @@ public class ProductDataService {
         CompletableFuture<Product> future = requestHelper.sendRequest("removeProduct", productId);
         return requestHelper.handleFuture(future);
     }
-    public List<Product> searchProducts(String query) throws IOException {
-        CompletableFuture<List<Product>> future = requestHelper.sendRequest("searchProducts", query);
-        return requestHelper.handleFuture(future);
-    }
     public List<Product> getProductsByOrderId(int orderId) throws IOException {
         CompletableFuture<List<Product>> future = requestHelper.sendRequest("getProductsByOrderId", orderId);
         return requestHelper.handleFuture(future);
