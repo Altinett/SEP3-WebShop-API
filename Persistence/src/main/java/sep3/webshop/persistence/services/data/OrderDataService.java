@@ -96,6 +96,7 @@ public class OrderDataService {
         for (int key : products.keySet()) {
             query.append("(").append(id).append(", ").append(key).append(", ").append(products.get(key)).append("),");
         }
+        System.out.println(query.substring(0, query.length() - 1));
         helper.executeUpdate(query.substring(0, query.length() - 1));
         updateTotal(id);
 
