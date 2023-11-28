@@ -8,11 +8,14 @@ import sep3.webshop.persistence.utils.DatabaseHelper;
 import sep3.webshop.persistence.utils.Empty;
 import sep3.webshop.persistence.utils.RequestHandler;
 import sep3.webshop.shared.model.Order;
+import sep3.webshop.shared.model.Product;
+import sep3.webshop.shared.utils.Printer;
 
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @Scope("singleton")
@@ -74,6 +77,30 @@ public class OrderDataService {
     }
 
     private Order newOrder(Order order) throws SQLException {
+        Map<Integer, Integer> products = order.getProducts();
+        String delimitedProducts = products.keySet().stream().map(String::valueOf).collect(Collectors.joining(","));
+
+        String amountQuery = """
+            SELECT 1 AS enough FROM (
+                SELECT array_agg(1) as arr
+                FROM Products WHERE id IN (
+        """ + delimitedProducts + ") AND amount - CASE";
+        String updateQuery = "UPDATE Products SET amount = CASE ";
+        for (int productId : products.keySet()) {
+            int amountToSubtract = products.get(productId);
+
+            amountQuery += " WHEN id=" + productId + " THEN " + amountToSubtract;
+            updateQuery += " WHEN id=" + productId + " THEN amount-" + amountToSubtract;
+        }
+        amountQuery += " ELSE 0 END >= 0) result WHERE array_length(arr, 1)=?";
+        updateQuery += " ELSE amount END WHERE id IN(" + delimitedProducts + ")";
+
+        boolean enoughProducts = helper.executeQuery(
+            amountQuery,
+            products.size()
+        ).next();
+        if (!enoughProducts) return null;
+
         int id = helper.executeUpdateWithGeneratedKeys(
         """
             INSERT INTO Orders
@@ -91,14 +118,13 @@ public class OrderDataService {
         ).get(0);
         order.setOrderId(id);
 
-        Map<Integer, Integer> products = order.getProducts();
-        StringBuilder query = new StringBuilder("INSERT INTO OrderProducts VALUES ");
+        String query = "INSERT INTO OrderProducts VALUES ";
         for (int key : products.keySet()) {
-            query.append("(").append(id).append(", ").append(key).append(", ").append(products.get(key)).append("),");
+            query += "(" + id + ", " + key + ", " + products.get(key) + "),";
         }
-        System.out.println(query.substring(0, query.length() - 1));
         helper.executeUpdate(query.substring(0, query.length() - 1));
         updateTotal(id);
+        helper.executeUpdate(updateQuery);
 
         return order;
     }

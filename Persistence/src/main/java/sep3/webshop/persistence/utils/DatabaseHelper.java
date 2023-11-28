@@ -49,6 +49,18 @@ public class DatabaseHelper<T> {
         PreparedStatement statement = prepare(connection, sql, parameters);
         return statement.executeQuery();
     }
+    public ResultSet executeQuery(String sql, Object... parameters) throws SQLException {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = prepare(connection, sql, parameters);
+            return statement.executeQuery();
+        }
+    }
+    public boolean execute(String sql, Object... parameters) throws SQLException {
+        try (Connection connection = getConnection()) {
+            PreparedStatement statement = prepare(connection, sql, parameters);
+            return statement.execute();
+        }
+    }
     public int executeUpdate(String sql, Object... parameters) throws SQLException {
         try (Connection connection = getConnection()) {
             PreparedStatement statement = prepare(connection, sql, parameters);
