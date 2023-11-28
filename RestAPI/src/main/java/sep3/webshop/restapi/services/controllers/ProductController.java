@@ -26,14 +26,18 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<Product>> getProducts(
-            @RequestParam(required = false, defaultValue = "true") boolean showFlagged,
-            @RequestParam(required = false, defaultValue = "") List<Integer> categories,
-            @RequestParam(required = false, defaultValue = "") String query
+        @RequestParam(required = false, defaultValue = "true") boolean showFlagged,
+        @RequestParam(required = false, defaultValue = "") List<Integer> categories,
+        @RequestParam(required = false, defaultValue = "") String query,
+        @RequestParam(required = false, defaultValue = "") Integer max,
+        @RequestParam(required = false, defaultValue = "") Integer min
     ) throws IOException {
         Map<String, Object> args = new HashMap<>();
         args.put("showFlagged", showFlagged);
         args.put("categories", categories);
         args.put("query", query);
+        args.put("min", min);
+        args.put("max", max);
 
         Printer.print(args);
 

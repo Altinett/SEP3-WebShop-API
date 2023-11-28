@@ -4,12 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import sep3.webshop.persistence.services.messaging.RequestQueueListener;
-import sep3.webshop.persistence.utils.DatabaseHelper;
-import sep3.webshop.persistence.utils.Empty;
-import sep3.webshop.persistence.utils.RequestHandler;
+import sep3.webshop.persistence.utils.*;
 import sep3.webshop.shared.model.Product;
 import sep3.webshop.shared.utils.Printer;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -63,6 +62,8 @@ public class ProductDataService {
     }
 
     private List<Product> getProducts(Map<String, Object> args) throws SQLException {
+        Integer min = (Integer) args.get("min");
+        Integer max = (Integer) args.get("max");
         String query = (String) args.get("query");
         Boolean showFlagged = (Boolean) args.get("showFlagged");
         List<Integer> categories = (List<Integer>) args.get("categories");
@@ -92,13 +93,11 @@ public class ProductDataService {
             query, query,
             showFlagged, showFlagged
         );
-        if (!categories.isEmpty()) {
-            return products.stream().filter(
-                    product -> categories.stream().anyMatch(
-                            category -> product.getCategoryIds().contains(category)
-                    )
-            ).toList();
-        }
+        products = ProductFilter.filterProducts(
+                products,
+                ProductFilter.categoryFilter(categories),
+                ProductFilter.priceRangeFilter(min, max)
+        );
         return products;
     }
 
@@ -113,7 +112,7 @@ public class ProductDataService {
             product.getPrice(),
             product.getAmount(),
             false,
-            product.getImage()
+            ImageResizer.resizeBase64Image(product.getImage(), 400)
         ).get(0);
         product.setId(id);
 
