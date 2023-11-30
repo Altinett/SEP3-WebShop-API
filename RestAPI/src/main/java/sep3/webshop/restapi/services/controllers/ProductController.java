@@ -26,11 +26,16 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<List<Product>> getProducts(
+        // Filtering
         @RequestParam(required = false, defaultValue = "true") boolean showFlagged,
         @RequestParam(required = false, defaultValue = "") List<Integer> categories,
         @RequestParam(required = false, defaultValue = "") String query,
         @RequestParam(required = false, defaultValue = "") Integer max,
-        @RequestParam(required = false, defaultValue = "") Integer min
+        @RequestParam(required = false, defaultValue = "") Integer min,
+
+        // Pagination
+        @RequestParam(required = false, defaultValue = "15") Integer pageSize,
+        @RequestParam(required = false, defaultValue = "1") Integer page
     ) throws IOException {
         Map<String, Object> args = new HashMap<>();
         args.put("showFlagged", showFlagged);
@@ -38,6 +43,8 @@ public class ProductController {
         args.put("query", query);
         args.put("min", min);
         args.put("max", max);
+        args.put("pageSize", pageSize);
+        args.put("page", page);
 
         Printer.print(args);
 

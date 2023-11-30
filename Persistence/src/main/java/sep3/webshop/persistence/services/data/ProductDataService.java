@@ -68,6 +68,12 @@ public class ProductDataService {
         Boolean showFlagged = (Boolean) args.get("showFlagged");
         List<Integer> categories = (List<Integer>) args.get("categories");
 
+        // Pagination
+        Integer page = (Integer) args.get("page");
+        Integer pageSize = (Integer) args.get("pageSize");
+
+        int offset = (page - 1) * pageSize;
+
         String sqlQuery = """
             SELECT
                 P.*,
@@ -85,13 +91,14 @@ public class ProductDataService {
         } else {
             sqlQuery += " ORDER BY Distance";
         }
-        sqlQuery += " LIMIT 40";
+        sqlQuery += " OFFSET ? LIMIT ?";
 
         List<Product> products = helper.map(
             ProductDataService::createProduct,
             sqlQuery,
             query, query,
-            showFlagged, showFlagged
+            showFlagged, showFlagged,
+            offset, pageSize
         );
         products = ProductFilter.filterProducts(
                 products,
