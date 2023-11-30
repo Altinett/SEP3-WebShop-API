@@ -31,6 +31,6 @@ public class CategoryController {
     @GetMapping("/{id}")
     public ResponseEntity<Category> getOrder(@PathVariable int id) throws IOException {
         Category category = data.getCategory(id);
-        return new ResponseEntity<>(category    , HttpStatus.OK);
+        return new ResponseEntity<>(category, HttpStatus.OK);
     }
 }

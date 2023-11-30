@@ -1,6 +1,7 @@
 package sep3.webshop.persistence.services.data;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import sep3.webshop.persistence.services.messaging.RequestQueueListener;
@@ -122,9 +123,10 @@ public class OrderDataService {
         for (int key : products.keySet()) {
             query += "(" + id + ", " + key + ", " + products.get(key) + "),";
         }
+        // Remove last comma from query to fix syntax error
         helper.executeUpdate(query.substring(0, query.length() - 1));
-        updateTotal(id);
         helper.executeUpdate(updateQuery);
+        updateTotal(id);
 
         return order;
     }
