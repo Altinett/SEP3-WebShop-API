@@ -7,10 +7,7 @@ import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.AliasFor;
 import sep3.webshop.persistence.utils.DatabaseHelper;
-import sep3.webshop.shared.model.Category;
-import sep3.webshop.shared.model.User;
-import sep3.webshop.shared.model.Order;
-import sep3.webshop.shared.model.Product;
+import sep3.webshop.shared.model.*;
 
 import java.lang.annotation.*;
 
@@ -35,6 +32,9 @@ public class Config {
     @Qualifier("CATEGORY_TEST") @Helper public DatabaseHelper<Category> getCategoryTestHelper() {
         return new DatabaseHelper<>(JDBC_TEST_URL, USERNAME, PASSWORD);
     }
+    @Qualifier("CITY_TEST") @Helper public DatabaseHelper<City> getCityTestHelper() {
+        return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
+    }
 
     @Primary @Helper public DatabaseHelper<Order> getOrderHelper() {
         return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
@@ -46,6 +46,9 @@ public class Config {
         return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
     }
     @Primary @Helper public DatabaseHelper<Category> getCategoryHelper() {
+        return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
+    }
+    @Primary @Helper public DatabaseHelper<City> getCityHelper() {
         return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
     }
 
