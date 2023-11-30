@@ -30,16 +30,16 @@ public class CategoryDataService {
     }
     private Category getCategory(int id) throws SQLException {
         return helper.mapSingle(
-                CategoryDataService::createCategory,
-                "SELECT * FROM Categories WHERE id=? LIMIT 1",
-                id
+            CategoryDataService::createCategory,
+            "SELECT * FROM Categories WHERE id=? LIMIT 1",
+            id
         );
     }
 
     private List<Category> getCategories(Empty empty) throws SQLException {
         return helper.map(
-                CategoryDataService::createCategory,
-                "SELECT * FROM Categories"
+            CategoryDataService::createCategory,
+            "SELECT * FROM Categories"
         );
     }
 

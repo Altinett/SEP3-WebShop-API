@@ -4,6 +4,7 @@ package sep3.webshop.shared.utils;
 import com.rabbitmq.client.Channel;
 import sep3.webshop.shared.amqp.RequestMessage;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,7 +36,12 @@ public class ConcreteRequestSubject implements RequestSubject {
         if (observers == null) return;
 
         for (Observer observer : observers) {
-            observer.update(correlationId, channel, data.getPayload());
+            try {
+                observer.update(correlationId, channel, data.getPayload());
+            } catch (IOException e) {
+                Printer.log("[ERROR] Something went wrong trying to send the error response");
+                e.printStackTrace();
+            }
         }
     }
 }
