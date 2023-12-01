@@ -32,4 +32,9 @@ public class CategoryDataService {
         return requestHelper.handleFuture(future);
     }
 
+    public Category editCategory(Category category) throws IOException {
+        CompletableFuture<Category> future = requestHelper.sendRequest("editCategory", category);
+        return requestHelper.handleFuture(future);
+    }
+
 }

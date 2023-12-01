@@ -26,7 +26,16 @@ public class CategoryDataService {
         this.helper = helper;
 
         listener.on("getCategories", RequestHandler.newObserver(this::getCategories));
+        listener.on("editCategory", RequestHandler.newObserver(this::editCategory));
         listener.on("getCategory", RequestHandler.newObserver(this::getCategory));
+    }
+    private Category editCategory(Category category) throws SQLException {
+        return helper.mapSingle(
+            CategoryDataService::createCategory,
+            "UPDATE Categories SET name=? WHERE id=? RETURNING *",
+            category.getId(),
+            category.getName()
+        );
     }
     private Category getCategory(int id) throws SQLException {
         return helper.mapSingle(

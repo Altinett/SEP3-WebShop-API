@@ -29,8 +29,14 @@ public class CategoryController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Category> getOrder(@PathVariable int id) throws IOException {
+    public ResponseEntity<Category> getCategory(@PathVariable int id) throws IOException {
         Category category = data.getCategory(id);
+        return new ResponseEntity<>(category, HttpStatus.OK);
+    }
+
+    @PostMapping("/edit")
+    public ResponseEntity<Category> editCategory(@RequestBody Category category) throws IOException {
+        Category editedCategory = data.editCategory(category);
         return new ResponseEntity<>(category, HttpStatus.OK);
     }
 }
