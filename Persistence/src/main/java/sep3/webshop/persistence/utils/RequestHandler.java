@@ -14,10 +14,13 @@ public class RequestHandler {
                 try {
                     R result = handler.execute((T) data);
                     ResponseSender.sendResponse(result, correlationId, channel);
+                    return;
                 } catch (SQLException | IOException e) {
                     e.printStackTrace();
-                    ResponseSender.sendResponse(null, correlationId, channel);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
+                ResponseSender.sendResponse(null, correlationId, channel);
             }
         };
     }

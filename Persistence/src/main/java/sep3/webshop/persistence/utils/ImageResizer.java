@@ -1,5 +1,6 @@
 package sep3.webshop.persistence.utils;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -10,12 +11,10 @@ import java.util.Base64;
 public class ImageResizer {
     public static String resizeBase64Image(String base64Image, int targetSize) {
         try {
-            // Step 1: Convert base64 string to byte array
             byte[] imageBytes = Base64.getDecoder().decode(base64Image);
 
-            // Step 2: Decode byte array into BufferedImage
             ByteArrayInputStream bis = new ByteArrayInputStream(imageBytes);
-            BufferedImage originalImage = javax.imageio.ImageIO.read(bis);
+            BufferedImage originalImage = ImageIO.read(bis);
             bis.close();
 
             // Calculate new dimensions with padding to make the image square
@@ -31,10 +30,10 @@ public class ImageResizer {
                 newHeight = targetSize;
             }
 
-            // Step 3: Resize the image with padding
+            // Resize the image with padding
             Image resizedImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
 
-            // Step 4: Add padding to make the image square
+            // Add padding to make the image square
             BufferedImage squaredImage = new BufferedImage(targetSize, targetSize, BufferedImage.TYPE_INT_RGB);
             Graphics2D g2d = squaredImage.createGraphics();
             g2d.setColor(Color.WHITE);

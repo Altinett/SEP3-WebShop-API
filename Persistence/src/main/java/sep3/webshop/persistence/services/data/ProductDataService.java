@@ -66,7 +66,8 @@ public class ProductDataService {
         Integer max = (Integer) args.get("max");
         String query = (String) args.get("query");
         Boolean showFlagged = (Boolean) args.get("showFlagged");
-        List<Integer> categories = (List<Integer>) args.get("categories");
+        //List<Integer> categories = (List<Integer>) args.get("categories");
+        int[] categories = ((List<Integer>) args.get("categories")).stream().mapToInt(Integer::intValue).toArray();
 
         // Pagination
         Integer page = (Integer) args.get("page");
@@ -75,17 +76,24 @@ public class ProductDataService {
         int offset = (page - 1) * pageSize;
 
         String sqlQuery = """
-            SELECT
-                P.*,
-                STRING_AGG(PC.category_id::text, ',') AS category_ids,
-                LEVENSHTEIN(LOWER(name), LOWER(?)) / GREATEST(LENGTH(name), LENGTH(?))::FLOAT AS Distance
-            FROM Products P
-            JOIN ProductCategories PC ON P.id = PC.product_id
-            WHERE
-                -- Whether to show/hide flagged products
-                (? OR (NOT ? AND P.flagged = FALSE))
-            GROUP BY P.id
+                SELECT
+                    P.*,
+                    STRING_AGG(PC.category_id::text, ',') AS category_ids,
+                    LEVENSHTEIN(LOWER(name), LOWER(?)) / GREATEST(LENGTH(name), LENGTH(?))::FLOAT AS Distance
+                FROM Products P
+                JOIN ProductCategories PC ON P.id = PC.product_id
+                WHERE
+                    -- Whether to show/hide flagged products
+                    (? OR (NOT ? AND P.flagged = FALSE))
+                    AND
+                    (COALESCE(ARRAY_LENGTH(?, 1), 0) = 0 OR (
+                        NOT COALESCE(ARRAY_LENGTH(?, 1), 0) = 0 AND
+                            ARRAY(SELECT category_id FROM ProductCategories WHERE product_id=P.id) && ?
+                        )
+                    )
+                GROUP BY P.id
             """;
+
         if (query.isEmpty()) {
             sqlQuery += " ORDER BY P.id";
         } else {
@@ -98,11 +106,12 @@ public class ProductDataService {
             sqlQuery,
             query, query,
             showFlagged, showFlagged,
+            categories, categories, categories,
             offset, pageSize
         );
         products = ProductFilter.filterProducts(
                 products,
-                ProductFilter.categoryFilter(categories),
+                //ProductFilter.categoryFilter(categories),
                 ProductFilter.priceRangeFilter(min, max)
         );
         return products;
