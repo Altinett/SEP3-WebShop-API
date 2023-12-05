@@ -7,7 +7,6 @@ import sep3.webshop.persistence.services.messaging.RequestQueueListener;
 import sep3.webshop.persistence.utils.DatabaseHelper;
 import sep3.webshop.persistence.utils.Empty;
 import sep3.webshop.persistence.utils.RequestHandler;
-import sep3.webshop.shared.model.Category;
 import sep3.webshop.shared.model.City;
 
 import java.sql.ResultSet;
@@ -27,6 +26,15 @@ public class LocationDataService {
         this.cityHelper = cityHelper;
 
         listener.on("getCities", RequestHandler.newObserver(this::getCities));
+        listener.on("cityExists", RequestHandler.newObserver(this::cityExists));
+    }
+
+
+    private Boolean cityExists(int postcode) throws SQLException {
+        return cityHelper.executeQuery(
+                "SELECT * FROM Cities WHERE postcode=?",
+                postcode
+        ).next();
     }
 
     private List<City> getCities(Empty empty) throws SQLException {

@@ -6,9 +6,7 @@ import org.springframework.stereotype.Component;
 import sep3.webshop.persistence.services.messaging.RequestQueueListener;
 import sep3.webshop.persistence.utils.*;
 import sep3.webshop.shared.model.Product;
-import sep3.webshop.shared.utils.Printer;
 
-import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,6 +32,27 @@ public class ProductDataService {
         listener.on("editProduct", RequestHandler.newObserver(this::editProduct));
         listener.on("removeProduct", RequestHandler.newObserver(this::removeProduct));
         listener.on("getProductsByOrderId", RequestHandler.newObserver(this::getProductsByOrderId));
+        listener.on("enoughProducts", RequestHandler.newObserver(this::enoughProducts));
+        listener.on("getProductsByIds", RequestHandler.newObserver(this::getProudctsByIds));
+    }
+
+    private Boolean enoughProducts(Map<Integer, Integer> products) throws SQLException {
+        String delimitedProducts = products.keySet().stream().map(String::valueOf).collect(Collectors.joining(","));
+        String amountQuery = """
+            SELECT 1 AS enough FROM (
+                SELECT array_agg(1) as arr
+                FROM Products WHERE id IN (
+        """ + delimitedProducts + ") AND amount - CASE";
+        for (int productId : products.keySet()) {
+            int amountToSubtract = products.get(productId);
+            amountQuery += " WHEN id=" + productId + " THEN " + amountToSubtract;
+        }
+        amountQuery += " ELSE 0 END >= 0) result WHERE array_length(arr, 1)=?";
+
+        return helper.executeQuery(
+                amountQuery,
+                products.size()
+        ).next();
     }
 
     private Product getProduct(int id) throws SQLException {
@@ -60,13 +79,19 @@ public class ProductDataService {
 
         );
     }
+    private List<Product> getProudctsByIds(List<Integer> ids) throws SQLException {
+        return helper.map(
+            ProductDataService::createProductWithoutCategoryIds,
+            "SELECT * FROM Products WHERE id = ANY(?)",
+            ids.stream().mapToInt(Integer::intValue).toArray()
+        );
+    }
 
     private List<Product> getProducts(Map<String, Object> args) throws SQLException {
         Integer min = (Integer) args.get("min");
         Integer max = (Integer) args.get("max");
         String query = (String) args.get("query");
         Boolean showFlagged = (Boolean) args.get("showFlagged");
-        //List<Integer> categories = (List<Integer>) args.get("categories");
         int[] categories = ((List<Integer>) args.get("categories")).stream().mapToInt(Integer::intValue).toArray();
 
         // Pagination
@@ -111,7 +136,6 @@ public class ProductDataService {
         );
         products = ProductFilter.filterProducts(
                 products,
-                //ProductFilter.categoryFilter(categories),
                 ProductFilter.priceRangeFilter(min, max)
         );
         return products;

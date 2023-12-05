@@ -23,9 +23,9 @@ public class UserDataService {
     ) {
         this.helper = helper;
 
-        listener.on("getUser", RequestHandler.newObserver(this::isRegistered));
+        listener.on("getUser", RequestHandler.newObserver(this::getUser));
     }
-    public User isRegistered(User user) throws SQLException {
+    public User getUser(User user) throws SQLException {
         return helper.mapSingle(
                 UserDataService::createUser,
                 """

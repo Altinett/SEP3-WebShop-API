@@ -37,6 +37,6 @@ public class CategoryController {
     @PostMapping("/edit")
     public ResponseEntity<Category> editCategory(@RequestBody Category category) throws IOException {
         Category editedCategory = data.editCategory(category);
-        return new ResponseEntity<>(category, HttpStatus.OK);
+        return new ResponseEntity<>(editedCategory, HttpStatus.OK);
     }
 }

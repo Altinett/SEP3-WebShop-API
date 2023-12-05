@@ -40,6 +40,9 @@ public class OrderController {
     @PostMapping("/order")
     public ResponseEntity<Order> createOrder(@RequestBody Order order) throws IOException {
         Order createdOrder = data.createOrder(order);
+        if (createdOrder == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
         return new ResponseEntity<>(createdOrder, HttpStatus.OK);
     }
 

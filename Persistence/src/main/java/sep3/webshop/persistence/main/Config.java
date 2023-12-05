@@ -19,34 +19,35 @@ public class Config {
     private static final String JDBC_URL = "jdbc:postgresql://localhost:5432/postgres?currentSchema=WebShop";
     private static final String USERNAME = "postgres", PASSWORD = "1234";
 
-    private <T> DatabaseHelper<T> helper() {
-        return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
-    }
+
     private <T> DatabaseHelper<T> testHelper() {
         return new DatabaseHelper<>(JDBC_TEST_URL, USERNAME, PASSWORD);
     }
-
-    @Qualifier("ORDER_TEST") @Helper
+    @Qualifier("ORDER_TEST") @Helper @Profile("TEST")
     public DatabaseHelper<Order> getOrderTestHelper() {
         return testHelper();
     }
-    @Qualifier("PRODUCT_TEST") @Helper
+    @Qualifier("PRODUCT_TEST") @Helper @Profile("TEST")
     public DatabaseHelper<Product> getProductTestHelper() {
         return testHelper();
     }
-    @Qualifier("USER_TEST") @Helper
+    @Qualifier("USER_TEST") @Helper @Profile("TEST")
     public DatabaseHelper<User> getUserTestHelper() {
         return testHelper();
     }
-    @Qualifier("CATEGORY_TEST") @Helper
+    @Qualifier("CATEGORY_TEST") @Helper @Profile("TEST")
     public DatabaseHelper<Category> getCategoryTestHelper() {
         return testHelper();
     }
-    @Qualifier("CITY_TEST") @Helper
+    @Qualifier("CITY_TEST") @Helper @Profile("TEST")
     public DatabaseHelper<City> getCityTestHelper() {
         return testHelper();
     }
 
+
+    private <T> DatabaseHelper<T> helper() {
+        return new DatabaseHelper<>(JDBC_URL, USERNAME, PASSWORD);
+    }
     @Primary @Helper
     public DatabaseHelper<Order> getOrderHelper() {
         return helper();

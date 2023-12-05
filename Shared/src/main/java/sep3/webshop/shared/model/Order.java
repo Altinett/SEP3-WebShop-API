@@ -1,6 +1,7 @@
 package sep3.webshop.shared.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Map;
@@ -12,14 +13,14 @@ public class Order implements Serializable {
     private int postcode;
     private Timestamp date = new Timestamp(millis);
     private boolean status;
-    private int total;
+    private BigDecimal total;
     private int phoneNumber;
     private String email;
     private Map<Integer, Integer> products;
 
     public Order() {}
 
-    public Order(String firstname, String lastname, String address, int postcode, boolean status, int total, int phoneNumber, String email) {
+    public Order(String firstname, String lastname, String address, int postcode, boolean status, BigDecimal total, int phoneNumber, String email) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.address = address;
@@ -31,7 +32,7 @@ public class Order implements Serializable {
         this.date = new Timestamp(millis);
     }
 
-    public Order (int orderId, String firstname, String lastname, String address, int postcode, boolean status, int total, int phoneNumber, String email, Timestamp date) {
+    public Order (int orderId, String firstname, String lastname, String address, int postcode, boolean status, BigDecimal total, int phoneNumber, String email, Timestamp date) {
         this(firstname, lastname, address, postcode, status, total, phoneNumber, email);
         this.orderId = orderId;
         this.date = date;
@@ -53,8 +54,11 @@ public class Order implements Serializable {
     public boolean getStatus() {
         return status;
     }
-    public int getTotal() {
+    public BigDecimal getTotal() {
         return total;
+    }
+    public void setTotal(BigDecimal total) {
+        this.total = total;
     }
     public int getPhoneNumber() {
         return phoneNumber;

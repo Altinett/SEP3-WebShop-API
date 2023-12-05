@@ -30,7 +30,9 @@ public class RequestHelper {
             return null;
         }
     }
-
+    public <T, R> R sendAndHandle(String requestType, T data) throws IOException {
+        return handleFuture(sendRequest(requestType, data));
+    }
     public <T> CompletableFuture<T> sendRequest(String requestType) throws IOException {
         return sendRequest(requestType, null);
     }
