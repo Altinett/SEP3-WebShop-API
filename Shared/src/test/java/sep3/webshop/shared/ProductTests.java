@@ -4,15 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
 
-import org.springframework.boot.test.context.SpringBootTest;
-import sep3.webshop.shared.model.Category;
 import sep3.webshop.shared.model.Product;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@SpringBootTest
 class ProductTests {
 
     @Test
