@@ -23,10 +23,6 @@ public class Product implements Serializable {
         this.image = image;
         this.flagged = flagged;
     }
-    public Product(int id, String name, String description, BigDecimal price, List<Integer> categoryIds, int amount, String image, boolean flagged) {
-        this(id, name, description, price, amount, image ,flagged);
-        this.categoryIds = categoryIds;
-    }
     public void setCategoryIds(List<Integer> categoryIds) {
         this.categoryIds = categoryIds;
     }
@@ -46,11 +42,17 @@ public class Product implements Serializable {
     public BigDecimal getPrice() {
         return price;
     }
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
     public List<Integer> getCategoryIds() {
         return categoryIds;
     }
     public int getAmount() {
         return amount;
+    }
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
     public String getImage() {
         return image;
