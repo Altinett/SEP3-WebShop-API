@@ -23,8 +23,11 @@ public class UserController {
 
     @PostMapping()
     public ResponseEntity<User> getUser(@RequestBody User user) throws IOException {
-        User registeredUser = data.getUser(user);
-        return new ResponseEntity<>(registeredUser, HttpStatus.OK);
+        User fetchedUser = data.getUser(user);
+        if (fetchedUser == null) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<>(fetchedUser, HttpStatus.OK);
     }
 
 }
