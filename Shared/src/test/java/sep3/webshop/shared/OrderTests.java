@@ -15,10 +15,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class OrderTests {
 
-    @Test
-    void contextLoads() {
-    }
-
     private Order sharedOrder;
     private Timestamp now = new Timestamp(System.currentTimeMillis());
     @BeforeEach
