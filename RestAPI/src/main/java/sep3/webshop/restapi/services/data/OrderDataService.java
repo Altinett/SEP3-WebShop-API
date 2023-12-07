@@ -50,7 +50,7 @@ public class OrderDataService {
         boolean validEmail = Validator.validEmail(order.getEmail());
         boolean validAddress = Validator.validAddress(order.getAddress());
         boolean validPostCode = Validator.validPostCode(order.getPostcode());
-        boolean validPhoneNumber = Validator.validPhoneNumber(order.getPhoneNumber());
+        boolean validPhoneNumber = Validator.validPhoneNumber(order.getPhonenumber());
 
         boolean emptyFirstname = Validator.isNullOrEmpty(order.getFirstname());
         boolean emptyLastname = Validator.isNullOrEmpty(order.getLastname());
@@ -63,7 +63,7 @@ public class OrderDataService {
             System.out.println("email " + !validEmail + " : " + order.getEmail());
             System.out.println("address " + !validAddress + " : " + order.getAddress());
             System.out.println("postcode " + !validPostCode + " : " + order.getPostcode());
-            System.out.println("phonenumber " + !validPhoneNumber + " : " + order.getPhoneNumber());
+            System.out.println("phonenumber " + !validPhoneNumber + " : " + order.getPhonenumber());
             System.out.println("firstname " + emptyFirstname + " : " + order.getFirstname());
             System.out.println("lastname " + emptyLastname + " : " + order.getLastname());
             System.out.println("products " + emptyProducts + " : ");

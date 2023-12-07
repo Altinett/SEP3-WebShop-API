@@ -70,7 +70,7 @@ class OrderTests {
     }
     @Test
     void testOrderGetPhoneNumber() {
-        assertEquals(sharedOrder.getPhoneNumber(), 12345678);
+        assertEquals(sharedOrder.getPhonenumber(), 12345678);
     }
     @Test
     void testOrderGetEmail() {

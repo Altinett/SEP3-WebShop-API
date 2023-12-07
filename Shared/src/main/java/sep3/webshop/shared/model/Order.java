@@ -14,20 +14,20 @@ public class Order implements Serializable {
     private Timestamp date = new Timestamp(millis);
     private boolean status;
     private BigDecimal total;
-    private int phoneNumber;
+    private int phonenumber;
     private String email;
     private Map<Integer, Integer> products;
 
     public Order() {}
 
-    public Order(String firstname, String lastname, String address, int postcode, boolean status, BigDecimal total, int phoneNumber, String email) {
+    public Order(String firstname, String lastname, String address, int postcode, boolean status, BigDecimal total, int phonenumber, String email) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.address = address;
         this.postcode = postcode;
         this.status = status;
         this.total = total;
-        this.phoneNumber = phoneNumber;
+        this.phonenumber = phonenumber;
         this.email = email;
         this.date = new Timestamp(millis);
     }
@@ -60,8 +60,8 @@ public class Order implements Serializable {
     public void setTotal(BigDecimal total) {
         this.total = total;
     }
-    public int getPhoneNumber() {
-        return phoneNumber;
+    public int getPhonenumber() {
+        return phonenumber;
     }
     public String getEmail() {
         return email;
