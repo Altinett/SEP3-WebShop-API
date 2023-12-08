@@ -42,7 +42,7 @@ public class RequestHelper {
         RequestMessage<T> requestMessage = new RequestMessage<>(requestType, correlationId, data);
 
         // Send request message
-        requestSender.sendRequest(requestMessage, correlationId);
+        requestSender.sendRequest(requestMessage);
 
         // CompletableFuture to wait for response
         CompletableFuture<T> completableFuture = new CompletableFuture<>();

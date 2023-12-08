@@ -20,7 +20,9 @@ public class RequestSender {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public <T> void sendRequest(RequestMessage<T> requestMessage, String correlationId) throws IOException {
+    public <T> void sendRequest(RequestMessage<T> requestMessage) throws IOException {
+        String correlationId = requestMessage.getCorrelationId();
+
         // Prepare message
         byte[] body = ObjectSerializer.serialize(requestMessage);
         MessageProperties messageProperties = new MessageProperties();

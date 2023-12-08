@@ -6,9 +6,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.*;
 import org.springframework.core.annotation.AliasFor;
+import org.springframework.stereotype.Component;
 import sep3.webshop.persistence.utils.DatabaseHelper;
 import sep3.webshop.persistence.utils.Helper;
 import sep3.webshop.shared.model.*;
+import sep3.webshop.shared.utils.ConcreteRequestSubject;
+import sep3.webshop.shared.utils.RequestSubject;
 
 import java.lang.annotation.*;
 
@@ -72,5 +75,11 @@ public class Config {
     @Bean
     public Queue requestQueue() {
         return new Queue("request-queue", false);
+    }
+
+    @Bean
+    @Scope("singleton")
+    public RequestSubject getRequestSubject() {
+        return new ConcreteRequestSubject();
     }
 }

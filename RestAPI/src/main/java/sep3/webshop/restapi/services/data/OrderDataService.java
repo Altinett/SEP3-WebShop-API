@@ -59,23 +59,8 @@ public class OrderDataService {
             emptyProducts || emptyFirstname || emptyLastname ||
             !validEmail || !validAddress || !validPhoneNumber || !validPostCode
         ) {
-            System.out.println("YUP");
-            System.out.println("email " + !validEmail + " : " + order.getEmail());
-            System.out.println("address " + !validAddress + " : " + order.getAddress());
-            System.out.println("postcode " + !validPostCode + " : " + order.getPostcode());
-            System.out.println("phonenumber " + !validPhoneNumber + " : " + order.getPhonenumber());
-            System.out.println("firstname " + emptyFirstname + " : " + order.getFirstname());
-            System.out.println("lastname " + emptyLastname + " : " + order.getLastname());
-            System.out.println("products " + emptyProducts + " : ");
-            Printer.print(order.getProducts());
             return null;
         }
-
-        long currentUnixTime = Instant.now().getEpochSecond();
-        long orderUnixTime = order.getDate().toInstant().getEpochSecond();
-        boolean isBeforeToday = orderUnixTime < currentUnixTime;
-        if (isBeforeToday) return null;
-
         boolean cityExists = requestHelper.sendAndHandle("cityExists", order.getPostcode());
         if (!cityExists) {
             return null;
@@ -88,7 +73,8 @@ public class OrderDataService {
         }
 
         BigDecimal total = new BigDecimal(0);
-        List<Product> products = requestHelper.sendAndHandle("getProductsByIds", orderProductMap.keySet().stream().toList());
+        List<Integer> productIds = orderProductMap.keySet().stream().toList();
+        List<Product> products = requestHelper.sendAndHandle("getProductsByIds", productIds);
         Printer.print(products);
         for (Product product : products) {
             int orderedAmount = orderProductMap.get(product.getId());

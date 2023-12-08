@@ -28,28 +28,22 @@ public class ProductDataService {
     }
 
     public List<Product> getProducts(Map<String, Object> args) throws IOException {
-        CompletableFuture<List<Product>> future = requestHelper.sendRequest("getProducts", args);
-        return requestHelper.handleFuture(future);
+        return requestHelper.sendAndHandle("getProducts", args);
     }
     public Product addProduct(Product product) throws IOException {
-        CompletableFuture<Product> future = requestHelper.sendRequest("addProduct", product);
-        return requestHelper.handleFuture(future);
+        return requestHelper.sendAndHandle("addProduct", product);
     }
     public Product getProduct(int id) throws IOException {
-        CompletableFuture<Product> future = requestHelper.sendRequest("getProduct", id);
-        return requestHelper.handleFuture(future);
+        return requestHelper.sendAndHandle("getProduct", id);
     }
     public Product editProduct(Product product) throws IOException {
-        CompletableFuture<Product> future = requestHelper.sendRequest("editProduct", product);
-        return requestHelper.handleFuture(future);
+        return requestHelper.sendAndHandle("editProduct", product);
     }
     public Product removeProduct(int productId) throws IOException {
-        CompletableFuture<Product> future = requestHelper.sendRequest("removeProduct", productId);
-        return requestHelper.handleFuture(future);
+        return requestHelper.sendAndHandle("removeProduct", productId);
     }
     public List<Product> getProductsByOrderId(int orderId) throws IOException {
-        CompletableFuture<List<Product>> future = requestHelper.sendRequest("getProductsByOrderId", orderId);
-        return requestHelper.handleFuture(future);
+        return requestHelper.sendAndHandle("getProductsByOrderId", orderId);
     }
 
 }

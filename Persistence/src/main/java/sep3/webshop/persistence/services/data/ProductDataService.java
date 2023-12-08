@@ -111,6 +111,7 @@ public class ProductDataService {
                     -- Whether to show/hide flagged products
                     (? OR (NOT ? AND P.flagged = FALSE))
                     AND
+                    -- Filter by categories
                     (COALESCE(ARRAY_LENGTH(?, 1), 0) = 0 OR (
                         NOT COALESCE(ARRAY_LENGTH(?, 1), 0) = 0 AND
                             ARRAY(SELECT category_id FROM ProductCategories WHERE product_id=P.id) && ?
