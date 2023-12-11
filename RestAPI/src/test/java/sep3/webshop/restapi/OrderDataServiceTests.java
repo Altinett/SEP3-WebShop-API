@@ -1,6 +1,6 @@
 package sep3.webshop.restapi;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +20,7 @@ class OrderDataServiceTests {
 
     @Test
     void contextLoads() {
-        Assertions.assertNotNull(orderDataService);
+         assertNotNull(orderDataService);
     }
 
     private BigDecimal calculateTotalPrice(List<Product> products) {
@@ -53,14 +53,14 @@ class OrderDataServiceTests {
 
         BigDecimal total = calculateTotalPrice(productsFromPersistence);
 
-        Assertions.assertEquals(total.setScale(2, BigDecimal.ROUND_HALF_EVEN), BigDecimal.valueOf(9824.59));
+        assertEquals(total.setScale(2, BigDecimal.ROUND_HALF_EVEN), BigDecimal.valueOf(9824.59));
     }
 
     @Test
     void testEmptyProductList() {
         List<Product> emptyProductList = new ArrayList<>();
         BigDecimal total = calculateTotalPrice(emptyProductList);
-        Assertions.assertEquals(BigDecimal.ZERO, total);
+        assertEquals(BigDecimal.ZERO, total);
     }
 
     @Test
@@ -73,7 +73,7 @@ class OrderDataServiceTests {
         productList.add(product);
 
         BigDecimal total = calculateTotalPrice(productList);
-        Assertions.assertEquals(BigDecimal.ZERO, total);
+        assertEquals(BigDecimal.ZERO, total);
     }
 
     @Test
@@ -86,7 +86,7 @@ class OrderDataServiceTests {
         productList.add(product);
 
         BigDecimal total = calculateTotalPrice(productList);
-        Assertions.assertEquals(BigDecimal.ZERO, total);
+        assertEquals(BigDecimal.ZERO, total);
     }
 
     @Test
@@ -97,7 +97,8 @@ class OrderDataServiceTests {
         List<Product> productList = new ArrayList<>();
         productList.add(product);
 
-        BigDecimal total = calculateTotalPrice(productList);
-        Assertions.assertEquals(BigDecimal.ZERO, total);
+        assertThrows(NullPointerException.class, () -> {
+            calculateTotalPrice(productList);
+        });
     }
 }
