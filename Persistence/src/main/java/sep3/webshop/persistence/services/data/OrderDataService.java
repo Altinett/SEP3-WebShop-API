@@ -63,7 +63,8 @@ public class OrderDataService {
 
     private Order newOrder(Order order) throws SQLException {
         Map<Integer, Integer> products = order.getProducts();
-        String delimitedProducts = products.keySet().stream().map(String::valueOf).collect(Collectors.joining(","));
+        String delimitedProducts = products.keySet().stream().map(String::valueOf)
+                .collect(Collectors.joining(","));
 
         String updateQuery = "UPDATE Products SET amount = CASE ";
         for (int productId : products.keySet()) {

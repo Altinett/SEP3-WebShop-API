@@ -34,6 +34,17 @@ class UserTests {
         assertEquals(sharedUser.getId(), 2);
     }
     @Test
+    void testGetIdZero() {
+        sharedUser.setId(0);
+        assertEquals(sharedUser.getId(), 0);
+    }
+    @Test
+    void testGetIdLargeValue() {
+        sharedUser.setId(Integer.MAX_VALUE);
+        assertEquals(sharedUser.getId(), Integer.MAX_VALUE);
+    }
+
+    @Test
     void testGetUsername() {
         assertEquals(sharedUser.getUsername(), "username");
     }

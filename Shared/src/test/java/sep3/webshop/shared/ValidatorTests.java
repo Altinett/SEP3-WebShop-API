@@ -8,23 +8,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.*;
 
 class ValidatorTests {
 
     @Test
+    void testNoEmail() {
+        assertFalse(Validator.validEmail(null));
+    }
+    @Test
+    void testEmptyEmail() {
+        assertFalse(Validator.validEmail(""));
+    }
+    @Test
     void testValidEmail() {
         assertTrue(Validator.validEmail("bob@bob.bob"));
     }
-
     @Test
     void testInvalidEmail() {
         assertFalse(Validator.validEmail("invalid.email@invalid"));
     }
 
+    @Test
+    void testNoAddress() {
+        assertFalse(Validator.validAddress(null));
+    }
+    @Test
+    void testEmptyAddress() {
+        assertFalse(Validator.validAddress(""));
+    }
     @Test
     void testValidAddress() {
         assertTrue(Validator.validAddress("123, Kamtjatka"));
@@ -35,20 +47,28 @@ class ValidatorTests {
     }
 
     @Test
+    void testPhoneNumberBelowLowerLimit() {
+        assertFalse(Validator.validPhoneNumber(0));
+    }
+    @Test
     void testValidPhoneNumber() {
         assertTrue(Validator.validPhoneNumber(12341234));
     }
     @Test
-    void testInvalidPhoneNumber() {
-        assertFalse(Validator.validPhoneNumber(123));
+    void testPhoneNumberAboveUpperLimit() {
+        assertFalse(Validator.validPhoneNumber(123412341));
     }
 
+    @Test
+    void testPostCodeBelowLowerLimit() {
+        assertFalse(Validator.validPostCode(999));
+    }
     @Test
     void testValidPostCode() {
         assertTrue(Validator.validPostCode(5000));
     }
     @Test
-    void testInvalidPostCode() {
+    void testPostCodeAboveUpperLimit() {
         assertFalse(Validator.validPostCode(99999));
     }
 
