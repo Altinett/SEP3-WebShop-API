@@ -47,13 +47,16 @@ class OrderDataServiceTests {
         productsFromPersistence.add(product2);
 
         Product product3 = new Product();
-        product3.setPrice(new BigDecimal(182.459));
+        product3.setPrice(new BigDecimal("182.459"));
         product3.setAmount(10);
         productsFromPersistence.add(product3);
 
         BigDecimal total = calculateTotalPrice(productsFromPersistence);
 
-        assertEquals(total.setScale(2, BigDecimal.ROUND_HALF_EVEN), BigDecimal.valueOf(9824.59));
+        assertEquals(
+                total.setScale(2, BigDecimal.ROUND_HALF_EVEN),
+                BigDecimal.valueOf(9824.59)
+        );
     }
 
     @Test

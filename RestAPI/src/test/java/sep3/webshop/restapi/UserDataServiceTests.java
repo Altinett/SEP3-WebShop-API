@@ -1,6 +1,6 @@
 package sep3.webshop.restapi;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +15,7 @@ class UserDataServiceTests {
 
     @Test
     void contextLoads() {
-        Assertions.assertNotNull(userDataService);
+        assertNotNull(userDataService);
     }
 
     @Test
@@ -23,8 +23,8 @@ class UserDataServiceTests {
         User loginInformation = new User("asdghjk1234", "supersecretpassword123");
         User userCredentials = new User("asdghjk1234", "supersecretpassword123");
 
-        Assertions.assertEquals(loginInformation.getUsername(), userCredentials.getUsername());
-        Assertions.assertEquals(loginInformation.getPassword(), userCredentials.getPassword());
+        assertEquals(loginInformation.getUsername(), userCredentials.getUsername());
+        assertEquals(loginInformation.getPassword(), userCredentials.getPassword());
     }
 
     @Test
@@ -32,11 +32,11 @@ class UserDataServiceTests {
         User loginInformation = new User(null, null);
         User userCredentials = new User(null, null);
 
-        Assertions.assertNull(loginInformation.getUsername());
-        Assertions.assertNull(loginInformation.getPassword());
+        assertNull(loginInformation.getUsername());
+        assertNull(loginInformation.getPassword());
 
-        Assertions.assertNull(userCredentials.getUsername());
-        Assertions.assertNull(userCredentials.getPassword());
+        assertNull(userCredentials.getUsername());
+        assertNull(userCredentials.getPassword());
     }
 
     @Test
@@ -44,11 +44,11 @@ class UserDataServiceTests {
         User loginInformation = new User("", "");
         User userCredentials = new User("", "");
 
-        Assertions.assertEquals("", loginInformation.getUsername());
-        Assertions.assertEquals("", loginInformation.getPassword());
+        assertEquals("", loginInformation.getUsername());
+        assertEquals("", loginInformation.getPassword());
 
-        Assertions.assertEquals("", userCredentials.getUsername());
-        Assertions.assertEquals("", userCredentials.getPassword());
+        assertEquals("", userCredentials.getUsername());
+        assertEquals("", userCredentials.getPassword());
     }
 
     @Test
@@ -56,8 +56,8 @@ class UserDataServiceTests {
         User loginInformation = new User("user1", "password123");
         User userCredentials = new User("user2", "password123");
 
-        Assertions.assertNotEquals(loginInformation.getUsername(), userCredentials.getUsername());
-        Assertions.assertEquals(loginInformation.getPassword(), userCredentials.getPassword());
+        assertNotEquals(loginInformation.getUsername(), userCredentials.getUsername());
+        assertEquals(loginInformation.getPassword(), userCredentials.getPassword());
     }
 
     @Test
@@ -65,7 +65,7 @@ class UserDataServiceTests {
         User loginInformation = new User("user1", "password123");
         User userCredentials = new User("user1", "differentpassword");
 
-        Assertions.assertEquals(loginInformation.getUsername(), userCredentials.getUsername());
-        Assertions.assertNotEquals(loginInformation.getPassword(), userCredentials.getPassword());
+        assertEquals(loginInformation.getUsername(), userCredentials.getUsername());
+        assertNotEquals(loginInformation.getPassword(), userCredentials.getPassword());
     }
 }

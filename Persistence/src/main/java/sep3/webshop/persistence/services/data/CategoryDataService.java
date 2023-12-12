@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 @Scope("singleton")
 public class CategoryDataService {
-    private DatabaseHelper<Category> helper;
+    private final DatabaseHelper<Category> helper;
 
     @Autowired
     public CategoryDataService(

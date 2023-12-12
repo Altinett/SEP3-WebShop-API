@@ -16,12 +16,4 @@ public class ObjectSerializer {
         ObjectInputStream ois = new ObjectInputStream(bais);
         return (T) ois.readObject();
     }
-    public static <T> byte[] serialize(List<T> list) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(list);
-        oos.close();
-        return baos.toByteArray();
-    }
-
 }

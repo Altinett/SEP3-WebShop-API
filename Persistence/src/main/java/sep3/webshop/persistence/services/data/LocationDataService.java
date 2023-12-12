@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 @Scope("singleton")
 public class LocationDataService {
-    private DatabaseHelper<City> cityHelper;
+    private final DatabaseHelper<City> cityHelper;
 
     @Autowired
     public LocationDataService(

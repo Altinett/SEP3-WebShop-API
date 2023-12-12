@@ -42,10 +42,9 @@ public class OrderDataService {
         return requestHelper.handleFuture(future);
     }
     public Order getOrder(int orderId) throws IOException {
-        CompletableFuture<Object> future = requestHelper.sendRequest("getOrder", orderId);
-
-        return (Order) requestHelper.handleFuture(future);
+        return requestHelper.sendAndHandle("getOrder", orderId);
     }
+
     public Order createOrder(Order order) throws IOException {
         boolean validEmail = Validator.validEmail(order.getEmail());
         boolean validAddress = Validator.validAddress(order.getAddress());
